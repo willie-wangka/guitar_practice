@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GuitarDaily</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0905;--bg2:#171009;--bg3:#1f140a;--bg4:#261a0d;
+  --amber:#c8811a;--amber-l:#e8a030;--amber-xl:#f0b840;
+  --cream:#e4cfaa;--muted:#6e5e44;--dim:#3a2a18;
+  --red:#c0392b;--blue:#3a8ab0;--green:#3a9060;--purple:#8060c0;
+  --radius:14px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+
+/* HEADER */
+.header{background:linear-gradient(180deg,#1c0f05 0%,var(--bg) 100%);border-bottom:1px solid var(--dim);padding:28px 16px 20px;text-align:center;position:relative;z-index:1}
+.header-sub{font-size:10px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+.header-title{font-family:'Playfair Display',serif;font-size:38px;color:var(--amber-xl);line-height:1;margin-bottom:6px}
+.header-title span{font-style:italic;color:var(--amber)}
+.guitar-type-row{display:flex;justify-content:center;gap:6px;margin-top:12px;flex-wrap:wrap}
+.type-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--dim);background:transparent;color:var(--muted);font-family:'DM Sans';font-size:11px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.type-btn.active{border-color:var(--amber);background:#c8811a18;color:var(--amber-l)}
+.type-btn:hover:not(.active){border-color:#4a3a28;color:var(--cream)}
+
+/* NAV */
+.nav{display:flex;background:var(--bg2);border-bottom:1px solid var(--dim);position:sticky;top:0;z-index:100}
+.nav-btn{flex:1;padding:13px 4px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-family:'DM Sans';font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;transition:all .2s}
+.nav-btn.active{border-bottom-color:var(--amber);color:var(--amber-l)}
+.nav-btn:hover:not(.active){color:var(--cream)}
+
+.main{max-width:680px;margin:0 auto;padding:24px 14px 80px;position:relative;z-index:1}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .22s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.section-title{font-family:'Playfair Display',serif;font-size:23px;color:var(--cream);margin-bottom:5px}
+.section-sub{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:22px}
+.card{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);padding:20px;margin-bottom:12px}
+.card-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--amber-l);margin-bottom:3px}
+.card-meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+.tip-box{background:var(--bg3);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:11px 15px;font-size:13px;color:var(--cream);line-height:1.7;margin-top:12px}
+
+/* BEATS */
+.beat-row{display:flex;gap:5px;margin-bottom:12px}
+.beat{flex:1;aspect-ratio:1;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;border:2px solid var(--dim);transition:all .08s;user-select:none}
+.beat.D{color:var(--amber)}.beat.U{color:var(--blue)}.beat.T{color:var(--purple)}.beat.N{color:var(--green)}.beat.skip{color:#3a2a18}
+.beat.active.D{background:#c8811a22;border-color:var(--amber);transform:scale(1.1);box-shadow:0 0 16px #c8811a60}
+.beat.active.U{background:#3a8ab022;border-color:var(--blue);transform:scale(1.1);box-shadow:0 0 16px #3a8ab060}
+.beat.active.T{background:#8060c022;border-color:var(--purple);transform:scale(1.1)}
+.beat.active.N{background:#3a906022;border-color:var(--green);transform:scale(1.1)}
+.beat.active.skip{transform:scale(1)}
+.play-btn{padding:7px 20px;border-radius:8px;border:none;font-family:'DM Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.play-btn.off{background:var(--amber);color:#0d0905}
+.play-btn.on{background:#8b1a1a;color:#fff}
+
+/* CHORDS */
+.chord-pills{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+.chord-pill{padding:8px 16px;border-radius:10px;border:1.5px solid var(--dim);background:var(--bg2);color:var(--muted);font-family:'Playfair Display',serif;font-size:16px;cursor:pointer;transition:all .2s}
+.chord-pill:hover{border-color:#4a3a28;color:var(--cream)}
+.chord-pill.active{border-color:var(--amber);background:#c8811a18;color:var(--amber-xl)}
+.chord-display{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);padding:20px;margin-bottom:10px}
+.chord-layout{display:flex;gap:20px;align-items:flex-start}
+.chord-info{flex:1;min-width:0}
+.chord-name{font-family:'Playfair Display',serif;font-size:21px;color:var(--amber-xl);margin-bottom:8px}
+.chord-tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:500}
+.tag-mute{background:#8b1a1a25;color:#e05050;border:1px solid #8b1a1a40}
+.tag-open{background:#c8811a20;color:var(--amber-l);border:1px solid #c8811a40}
+.tag-info{background:var(--bg3);color:#8a7a5a;border:1px solid var(--dim)}
+.chord-fingers{font-size:13px;color:#8a7a5a;line-height:1.9}
+.chord-fingers span{color:var(--cream)}
+.alt-toggle{width:100%;padding:12px 15px;background:var(--bg2);border:1px solid var(--dim);border-radius:10px;color:var(--amber);font-family:'DM Sans';font-size:13px;font-weight:500;cursor:pointer;text-align:left;margin-bottom:9px;transition:all .2s}
+.alt-toggle:hover{border-color:#4a3a28}
+.alt-card{background:var(--bg2);border:1px solid var(--dim);border-radius:11px;padding:16px;margin-bottom:9px}
+
+/* SONGS */
+.song-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px}
+@media(max-width:460px){.song-grid{grid-template-columns:1fr}}
+.song-card{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
+.song-card:hover{border-color:var(--amber);background:#c8811a0e}
+.song-card-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--cream);margin-bottom:2px}
+.song-card-artist{font-size:11px;color:var(--muted);margin-bottom:9px}
+.song-card-chords{display:flex;gap:4px;flex-wrap:wrap}
+.chord-badge{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--bg3);color:var(--amber);border:1px solid var(--dim);font-family:'Playfair Display',serif}
+.diff-badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;letter-spacing:.3px;white-space:nowrap}
+.diff-beginner{background:#1a3a1a;color:#60c870}
+.diff-intermediate{background:#2a2a0a;color:#c8b840}
+.diff-advanced{background:#2a0a0a;color:#c84040}
+
+/* AI SEARCH */
+.search-box{display:flex;gap:10px;margin-bottom:20px}
+.search-input{flex:1;background:var(--bg2);border:1.5px solid var(--dim);border-radius:10px;padding:12px 16px;color:var(--cream);font-family:'DM Sans';font-size:14px;outline:none;transition:border-color .2s}
+.search-input::placeholder{color:var(--muted)}
+.search-input:focus{border-color:var(--amber)}
+.search-btn{padding:12px 20px;background:var(--amber);border:none;border-radius:10px;color:#0d0905;font-family:'DM Sans';font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.search-btn:hover{filter:brightness(1.1)}
+.search-btn:disabled{opacity:.5;cursor:not-allowed}
+.ai-result{background:var(--bg2);border:1px solid var(--amber);border-radius:var(--radius);padding:20px;margin-bottom:16px;animation:fadeIn .3s ease}
+.ai-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 9px;border-radius:20px;background:#c8811a18;border:1px solid #c8811a40;color:var(--amber);font-weight:600;letter-spacing:1px;margin-bottom:10px}
+
+/* SONG DETAIL */
+.song-detail{display:none}.song-detail.visible{display:block}
+.song-header{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);padding:20px;margin-bottom:14px}
+.song-title-big{font-family:'Playfair Display',serif;font-size:24px;color:var(--amber-xl);margin-bottom:2px}
+.song-artist-big{font-size:13px;color:var(--muted);margin-bottom:12px}
+.song-meta-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.back-btn{padding:8px 15px;background:var(--bg3);border:1px solid var(--dim);border-radius:8px;color:var(--muted);font-family:'DM Sans';font-size:12px;cursor:pointer;margin-bottom:16px;transition:all .2s}
+.back-btn:hover{color:var(--cream);border-color:#4a3a28}
+.walkthrough-section{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;transition:border-color .2s}
+.walkthrough-section.current{border-color:var(--amber);box-shadow:0 0 22px #c8811a15}
+.section-header{padding:15px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.section-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.section-label.verse{color:#6ab0d4}.section-label.chorus{color:var(--amber-l)}.section-label.bridge{color:#a060c8}
+.section-label.intro{color:#60c870}.section-label.outro{color:#c87060}.section-label.prechorus{color:#c8c040}
+.section-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--cream)}
+.current-badge{font-size:9px;padding:3px 7px;background:var(--amber);color:#0d0905;border-radius:20px;font-weight:700;letter-spacing:1px}
+.section-body{padding:0 18px 18px;display:none}
+.walkthrough-section.open .section-body{display:block}
+.chord-sequence{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;margin-top:10px}
+.seq-chord{background:var(--bg3);border:1.5px solid var(--dim);border-radius:9px;padding:9px 14px;font-family:'Playfair Display',serif;font-size:17px;color:var(--amber-l);cursor:pointer;transition:all .2s}
+.seq-chord:hover,.seq-chord.highlighted{border-color:var(--amber);background:#c8811a15;color:var(--amber-xl)}
+.beat-count{font-size:10px;color:var(--muted);font-family:'DM Sans';font-weight:500;display:block;text-align:center;margin-top:2px}
+.section-instructions{font-size:13px;color:#8a7a5a;line-height:1.7;margin-bottom:12px}
+.pattern-ref{display:inline-block;padding:3px 9px;background:#c8811a18;border:1px solid #c8811a40;border-radius:6px;color:var(--amber);font-size:11px;font-weight:500}
+.walkthrough-controls{display:flex;gap:9px;margin-top:18px}
+.wt-btn{padding:11px 20px;border-radius:9px;border:none;font-family:'DM Sans';font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;flex:1}
+.wt-prev{background:var(--bg3);border:1px solid var(--dim);color:var(--muted)}
+.wt-prev:hover:not(:disabled){color:var(--cream);border-color:#4a3a28}
+.wt-prev:disabled,.wt-next:disabled{opacity:.35;cursor:not-allowed}
+.wt-next{background:var(--amber);color:#0d0905}
+.wt-next:hover:not(:disabled){filter:brightness(1.1)}
+.mini-diagrams{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.mini-diagram-wrap{text-align:center;cursor:pointer}
+.mini-diagram-name{font-family:'Playfair Display',serif;font-size:12px;color:var(--amber-l);margin-top:3px}
+.progress-bar{background:var(--dim);height:3px;border-radius:2px;margin:14px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--amber-l));border-radius:2px;transition:width .4s}
+
+/* TUNER */
+.tuner-wrap{text-align:center;padding:10px 0}
+.tuner-note{font-family:'Playfair Display',serif;font-size:96px;color:var(--amber-xl);line-height:1;margin-bottom:4px;min-height:100px;display:flex;align-items:center;justify-content:center}
+.tuner-freq{font-family:'DM Mono',monospace;font-size:18px;color:var(--muted);margin-bottom:20px}
+.tuner-cents{font-size:14px;font-weight:600;margin-bottom:18px;min-height:20px}
+.cents-flat{color:var(--blue)}.cents-sharp{color:var(--red)}.cents-intune{color:var(--green)}
+.tuner-bar-wrap{position:relative;height:12px;background:var(--dim);border-radius:6px;margin:0 auto 22px;max-width:340px}
+.tuner-bar-fill{position:absolute;top:0;height:100%;border-radius:6px;transition:width .1s,left .1s,background .1s}
+.tuner-needle{position:absolute;top:-4px;width:4px;height:20px;background:var(--amber);border-radius:2px;transform:translateX(-50%);transition:left .1s}
+.tuner-center-line{position:absolute;top:-4px;left:50%;width:2px;height:20px;background:#4a3a28;border-radius:1px;transform:translateX(-50%)}
+.tuner-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px;max-width:340px;margin-left:auto;margin-right:auto;margin-bottom:22px}
+.mic-btn{padding:14px 36px;border-radius:40px;border:2px solid var(--amber);background:transparent;color:var(--amber-l);font-family:'DM Sans';font-size:15px;font-weight:600;cursor:pointer;transition:all .3s;margin-bottom:22px}
+.mic-btn.listening{background:var(--amber);color:#0d0905;box-shadow:0 0 30px #c8811a40}
+.mic-btn:hover{background:#c8811a18}
+.string-ref{margin-top:6px}
+.string-ref-title{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+.string-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.string-btn{padding:10px 16px;border-radius:9px;border:1.5px solid var(--dim);background:var(--bg2);color:var(--muted);font-family:'Playfair Display',serif;font-size:16px;cursor:pointer;transition:all .2s;text-align:center}
+.string-btn:hover{border-color:#4a3a28;color:var(--cream)}
+.string-btn.target{border-color:var(--amber);background:#c8811a18;color:var(--amber-xl)}
+.string-num{font-size:9px;color:var(--muted);font-family:'DM Sans';display:block;margin-top:1px}
+.tuner-status{font-size:12px;color:var(--muted);min-height:18px;margin-bottom:16px}
+
+/* THUMB TIPS */
+.tip-card{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);padding:18px;margin-bottom:11px;display:flex;gap:13px}
+.tip-num{width:32px;height:32px;border-radius:8px;background:#c8811a18;border:1px solid #c8811a40;display:flex;align-items:center;justify-content:center;color:var(--amber);font-family:'Playfair Display',serif;font-size:15px;flex-shrink:0}
+.tip-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--amber-l);margin-bottom:5px}
+.tip-body{font-size:13px;color:#8a7a5a;line-height:1.7}
+
+/* LEGEND */
+.legend{background:var(--bg2);border:1px solid var(--dim);border-radius:var(--radius);padding:16px;margin-top:18px}
+.legend-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:11px}
+.legend-items{display:flex;gap:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:7px}
+.legend-swatch{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#000000b0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--amber);border-radius:18px;padding:26px;max-width:340px;width:100%;animation:fadeIn .2s ease;position:relative}
+.modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--cream)}
+.modal-title{font-family:'Playfair Display',serif;font-size:21px;color:var(--amber-xl);margin-bottom:14px}
+
+/* LOADING SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #c8811a40;border-top-color:var(--amber);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TUNING ALERT */
+.tuning-alert{background:#2a1a0a;border:1px solid #c8811a60;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--amber-l);line-height:1.7}
+.tuning-alert strong{color:var(--amber-xl)}
+
+/* BASS INFO */
+.bass-info{background:var(--bg3);border:1px solid var(--dim);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:#8a7a5a;line-height:1.6}
+
+/* GAME MODE */
+.game-overlay{position:fixed;inset:0;background:#0a0704;z-index:300;display:none;flex-direction:column;overflow:hidden;font-family:'DM Sans',sans-serif}
+.game-overlay.open{display:flex}
+
+/* Top bar */
+.game-top{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #2a1e10;flex-shrink:0;gap:10px}
+.game-title-text{font-family:'Playfair Display',serif;font-size:15px;color:var(--amber-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.game-top-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.game-close-btn{background:none;border:1px solid #2a1e10;border-radius:8px;color:var(--muted);font-size:12px;font-weight:600;padding:5px 12px;cursor:pointer;font-family:'DM Sans'}
+.game-close-btn:hover{color:var(--cream)}
+
+/* Mode toggle */
+.game-mode-row{display:flex;gap:6px;padding:8px 14px;flex-shrink:0;border-bottom:1px solid #1a1008}
+.game-mode-btn{flex:1;padding:7px 10px;border-radius:9px;border:1.5px solid #2a1e10;background:transparent;color:var(--muted);font-family:'DM Sans';font-size:11px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s;line-height:1.4}
+.game-mode-btn.active-beginner{border-color:var(--amber);background:#c8811a18;color:var(--amber-xl)}
+.game-mode-btn.active-intermediate{border-color:var(--blue);background:#3a8ab018;color:#60c0e8}
+
+/* Lyrics panel */
+.game-lyrics-panel{flex:1;overflow-y:auto;padding:16px 16px 160px;scroll-behavior:smooth;font-family:'DM Mono',monospace}
+.game-section-header{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;font-weight:600;font-family:'DM Sans',sans-serif}
+.game-section-header:first-child{margin-top:4px}
+
+/* Each line of the tab */
+.game-lyric-line{display:flex;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;line-height:1}
+
+/* Each segment = chord name + lyric text stacked */
+.game-segment{display:inline-flex;flex-direction:column;align-items:flex-start;position:relative;margin-right:0}
+
+/* Chord label row - sits above the lyric */
+.game-chord-label{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:transparent;min-height:19px;display:block;white-space:pre;padding-right:8px;letter-spacing:.3px;user-select:none;line-height:1.4}
+.game-chord-label.has-chord{color:var(--amber)}
+
+/* Lyric text row */
+.game-lyric-text{font-size:16px;color:#b8a880;white-space:pre;padding:1px 0;display:block;line-height:1.4;border-bottom:2px solid transparent;transition:color .15s,background .15s}
+
+/* States */
+.game-segment.played .game-chord-label{color:#3a2a14}
+.game-segment.played .game-lyric-text{color:#3a2a14}
+.game-segment.current .game-chord-label{color:var(--amber-xl) !important}
+.game-segment.current .game-lyric-text{color:#fff;border-bottom-color:var(--amber)}
+.game-segment.waiting .game-chord-label{color:var(--amber-xl) !important}
+.game-segment.waiting .game-lyric-text{color:#fff;border-bottom-color:var(--amber);animation:waitBlink .85s ease-in-out infinite}
+@keyframes waitBlink{0%,100%{border-bottom-color:var(--amber);color:#fff}50%{border-bottom-color:var(--amber-xl);color:var(--amber-xl)}}
+
+/* Bottom HUD */
+.game-hud{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,#0a0704 85%,transparent);padding:10px 14px 14px;display:flex;align-items:flex-end;gap:12px;flex-shrink:0}
+.game-hud-chord{flex-shrink:0;text-align:center}
+.game-hud-chord-name{font-family:'Playfair Display',serif;font-size:28px;color:var(--amber-xl);line-height:1;margin-bottom:4px}
+.game-hud-chord-sub{font-size:10px;color:var(--muted);letter-spacing:1px}
+.game-hud-center{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.game-hud-status{font-size:12px;color:var(--muted);text-align:center;min-height:16px}
+.game-hud-mic{width:44px;height:44px;border-radius:50%;border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .3s}
+.game-hud-mic.listening{background:#c8811a22;box-shadow:0 0 20px #c8811a50;animation:micPulse .8s ease-in-out infinite}
+.game-hud-mic.success{background:#1a3a1a;border-color:var(--green);box-shadow:0 0 20px #3a906060}
+.game-hud-mic.fail{background:#3a1a1a;border-color:var(--red);animation:failShake .3s ease}
+@keyframes micPulse{0%,100%{box-shadow:0 0 10px #c8811a40}50%{box-shadow:0 0 28px #c8811a80}}
+@keyframes failShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.game-play-btn{padding:11px 26px;border-radius:30px;border:none;font-family:'DM Sans';font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.game-play-btn.play{background:var(--amber);color:#0a0704}
+.game-play-btn.pause{background:#8b1a1a;color:#fff}
+.game-hud-next{flex-shrink:0;text-align:center}
+.game-hud-next-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.game-hud-next-chord{font-family:'Playfair Display',serif;font-size:18px;color:#6e5e44}
+.game-tempo-row{display:flex;align-items:center;gap:8px;padding:0 14px 4px;flex-shrink:0}
+.game-tempo-row input[type=range]{flex:1;accent-color:var(--amber)}
+.game-tempo-row span{font-size:11px;color:var(--muted);white-space:nowrap}
+.game-count-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0a070488;z-index:5;pointer-events:none}
+.game-count-num{font-family:'Playfair Display',serif;font-size:88px;color:var(--amber-xl);animation:countIn .3s ease}
+@keyframes countIn{0%{transform:scale(1.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.game-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="chordModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title" id="modalTitle"></div>
+    <div id="modalDiagram"></div>
+    <div class="tip-box" id="modalTip" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- GAME MODE OVERLAY -->
+<div class="game-overlay" id="gameOverlay">
+
+  <!-- Top bar -->
+  <div class="game-top">
+    <div class="game-title-text" id="gameTitle">Play Along</div>
+    <div class="game-top-right">
+      <div id="gameCountOverlay" class="game-count-overlay" style="display:none"><div class="game-count-num" id="gameCountNum"></div></div>
+      <button class="game-close-btn" onclick="stopGame()">✕ Exit</button>
+    </div>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="game-mode-row">
+    <button class="game-mode-btn active-beginner" id="modeBeginner" onclick="setGameMode('beginner')">🐢 Beginner — waits for you</button>
+    <button class="game-mode-btn" id="modeIntermediate" onclick="setGameMode('intermediate')">⚡ Intermediate — keeps going</button>
+  </div>
+
+  <!-- Tempo (intermediate only) -->
+  <div class="game-tempo-row" id="gameTempoRow" style="display:none">
+    <span style="font-size:11px;color:var(--muted)">Tempo</span>
+    <input type="range" min="40" max="100" value="75" id="tempoSlider" oninput="updateTempo(this.value)">
+    <span id="tempoVal" style="font-size:11px;color:var(--amber);width:34px;text-align:right">75%</span>
+  </div>
+
+  <!-- Lyrics panel -->
+  <div class="game-lyrics-panel" id="gameLyricsPanel">
+    <div class="game-loading"><span class="spinner"></span>Loading song...</div>
+  </div>
+
+  <!-- Bottom HUD -->
+  <div class="game-hud">
+    <div class="game-hud-chord">
+      <div class="game-hud-chord-name" id="hudChordName">—</div>
+      <div id="hudDiagram"></div>
+      <div class="game-hud-chord-sub">PLAY NOW</div>
+    </div>
+    <div class="game-hud-center">
+      <div class="game-hud-status" id="hudStatus">Press Start to begin</div>
+      <div class="game-hud-mic" id="hudMic" style="display:none">🎙</div>
+      <button class="game-play-btn play" id="gamePlayBtn" onclick="toggleGamePlay()">▶ Start</button>
+    </div>
+    <div class="game-hud-next">
+      <div class="game-hud-next-label">Next</div>
+      <div class="game-hud-next-chord" id="hudNextChord">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-sub">Your Daily Guitar Practice</div>
+  <h1 class="header-title">Guitar<span>Daily</span></h1>
+  <div class="guitar-type-row" id="guitarTypeRow"></div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('strum',this)">🎸 Strum</button>
+  <button class="nav-btn" onclick="switchTab('chords',this)">✋ Chords</button>
+  <button class="nav-btn" onclick="switchTab('songs',this)">🎵 Songs</button>
+  <button class="nav-btn" onclick="switchTab('tuner',this)">🎛 Tuner</button>
+  <button class="nav-btn" onclick="switchTab('thumb',this)">👍 Thumb</button>
+</nav>
+
+<div class="main">
+
+  <!-- STRUMMING -->
+  <div class="tab-panel active" id="tab-strum">
+    <h2 class="section-title">Daily Strumming Practice</h2>
+    <p class="section-sub">Work through these patterns in order. Hit ▶ Play to follow the beat in real time.</p>
+    <div id="strumPatterns"></div>
+    <div class="legend">
+      <div class="legend-title">Legend</div>
+      <div class="legend-items">
+        <div class="legend-item"><div class="legend-swatch" style="background:#c8811a22;color:var(--amber);border:2px solid var(--amber)">↓</div><span style="font-size:12px;color:#8a7a5a">Down</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#3a8ab022;color:var(--blue);border:2px solid var(--blue)">↑</div><span style="font-size:12px;color:#8a7a5a">Up</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#8060c022;color:var(--purple);border:2px solid var(--purple)">T</div><span style="font-size:12px;color:#8a7a5a">Thumb</span></div>
+        <div class="legend-item"><div class="legend-swatch" style="background:var(--bg3);color:#3a2a18;border:2px solid var(--dim)">·</div><span style="font-size:12px;color:#8a7a5a">Skip</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHORDS -->
+  <div class="tab-panel" id="tab-chords">
+    <h2 class="section-title">Chord Library</h2>
+    <p class="section-sub" id="chordsSubtitle">Tap a chord to see the fingering, tips, and easier alternatives.</p>
+    <div id="bassInfoBox"></div>
+    <div class="chord-pills" id="chordPills"></div>
+    <div id="chordDetail"></div>
+  </div>
+
+  <!-- SONGS -->
+  <div class="tab-panel" id="tab-songs">
+    <div id="songLibrary">
+      <h2 class="section-title">Song Library</h2>
+      <p class="section-sub">Pick a song below, or search any song with AI to get a full walkthrough.</p>
+
+      <div class="search-box">
+        <input class="search-input" id="songSearch" placeholder='e.g. "Creep" by Radiohead' />
+        <button class="search-btn" id="searchBtn" onclick="searchSong()">✦ Learn It</button>
+      </div>
+      <div id="aiResultArea"></div>
+
+      <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Built-In Songs</div>
+      <div class="song-grid" id="songGrid"></div>
+    </div>
+    <div class="song-detail" id="songDetail"></div>
+  </div>
+
+  <!-- TUNER -->
+  <div class="tab-panel" id="tab-tuner">
+    <h2 class="section-title">Chromatic Tuner</h2>
+    <p class="section-sub">Tune by ear using your microphone. Tap a string below to see its target note, then play it and tune until the bar turns green.</p>
+    <div class="card tuner-wrap">
+      <button class="mic-btn" id="micBtn" onclick="toggleTuner()">🎙 Start Tuning</button>
+      <div class="tuner-status" id="tunerStatus">Tap the button and allow microphone access</div>
+      <div class="tuner-note" id="tunerNote">—</div>
+      <div class="tuner-freq" id="tunerFreq">— Hz</div>
+      <div class="tuner-cents" id="tunerCents"></div>
+      <div class="tuner-bar-wrap" id="tunerBarWrap">
+        <div class="tuner-center-line"></div>
+        <div class="tuner-needle" id="tunerNeedle" style="left:50%"></div>
+        <div class="tuner-bar-fill" id="tunerBarFill" style="width:4px;left:50%;background:var(--amber)"></div>
+      </div>
+      <div class="tuner-labels"><span>-50¢</span><span>flat</span><span>♦ in tune</span><span>sharp</span><span>+50¢</span></div>
+    </div>
+    <div class="card string-ref">
+      <div class="string-ref-title" id="stringRefTitle">String Reference</div>
+      <div class="string-btns" id="stringBtns"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--dim)">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Special Tunings</div>
+        <button onclick="setSpecialTuning('bddddd')" id="bdddddBtn" style="padding:8px 14px;border-radius:8px;border:1.5px solid var(--dim);background:transparent;color:var(--muted);font-family:'DM Sans';font-size:12px;font-weight:600;cursor:pointer;transition:all .2s">🎵 Iris — B D D D D D</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div class="card-title" style="font-size:15px;margin-bottom:8px">How to use</div>
+      <div style="font-size:13px;color:#8a7a5a;line-height:1.8">
+        1. Tap <strong style="color:var(--cream)">Start Tuning</strong> and allow mic access<br>
+        2. Tap a string button to highlight its target note<br>
+        3. Play that string on your guitar<br>
+        4. Tune up or down until the bar turns <strong style="color:var(--green)">green</strong><br>
+        5. Repeat for each string
+      </div>
+    </div>
+  </div>
+
+  <!-- THUMB -->
+  <div class="tab-panel" id="tab-thumb">
+    <h2 class="section-title">Thumb Muting Guide</h2>
+    <p class="section-sub">Most issues come down to hand position, not hand size — read through these carefully.</p>
+    <div id="thumbTips"></div>
+    <div class="card" style="border-color:#c8811a40;margin-top:6px">
+      <div class="card-title">Best practice chords</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">These require muting — practice them slowly and check low strings before strumming.</p>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button onclick="jumpToChord('D')" class="chord-pill" style="border-color:var(--amber);color:var(--amber-l)">D →</button>
+        <button onclick="jumpToChord('Am')" class="chord-pill" style="border-color:var(--amber);color:var(--amber-l)">Am →</button>
+        <button onclick="jumpToChord('C')" class="chord-pill" style="border-color:var(--amber);color:var(--amber-l)">C →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  GUITAR TYPES
+// ═══════════════════════════════════════════════════════════
+const GUITAR_TYPES = {
+  acoustic:  { label:'Acoustic',  icon:'🎸', strings:['E','A','D','G','B','E'], freqs:[82.41,110.0,146.83,196.0,246.94,329.63], count:6, tuning:'Standard (EADGBE)' },
+  electric:  { label:'Electric',  icon:'⚡', strings:['E','A','D','G','B','E'], freqs:[82.41,110.0,146.83,196.0,246.94,329.63], count:6, tuning:'Standard (EADGBE)' },
+  bass:      { label:'Bass',      icon:'🎵', strings:['E','A','D','G'],         freqs:[41.20,55.0,73.42,98.0],                   count:4, tuning:'Standard (EADG)' },
+  classical: { label:'Classical', icon:'🎼', strings:['E','A','D','G','B','E'], freqs:[82.41,110.0,146.83,196.0,246.94,329.63], count:6, tuning:'Standard (EADGBE)' },
+};
+let currentType = 'acoustic';
+
+// ═══════════════════════════════════════════════════════════
+//  CHORD DATA (6-string)
+// ═══════════════════════════════════════════════════════════
+const CHORDS = {
+  G:  { name:'G Major',  fingers:[{s:6,f:3,n:2},{s:5,f:2,n:1},{s:1,f:3,n:4}], open:[4,3,2], muted:[], tip:'Arch fingers so strings 2, 3, 4 ring open. Fingertips press right behind the frets — not on top.', alts:[{name:'G (2-finger)',fingers:[{s:6,f:3,n:2},{s:5,f:2,n:1}],note:'Leave high strings open. Easier for beginners.'}] },
+  C:  { name:'C Major',  fingers:[{s:5,f:3,n:3},{s:4,f:2,n:2},{s:2,f:1,n:1}], open:[3,1], muted:[6], tip:'String 6 must be muted — use your thumb or tip of ring finger. Make sure string 3 (G) rings fully open.', alts:[{name:'Cadd9',fingers:[{s:5,f:3,n:3},{s:4,f:2,n:2},{s:2,f:3,n:4},{s:1,f:3,n:4}],note:'Easy G→Cadd9 transition. Great beginner sound.'},{name:'C (4-string)',fingers:[{s:4,f:2,n:2},{s:2,f:1,n:1}],note:'Simplified — strum only strings 1–4.'}] },
+  D:  { name:'D Major',  fingers:[{s:3,f:2,n:1},{s:1,f:2,n:2},{s:2,f:3,n:3}], open:[], muted:[6,5], tip:'Mute strings 5 & 6. Rest thumb on string 6, let index underside brush string 5. Best thumb-muting practice chord!', alts:[{name:'Dsus2',fingers:[{s:3,f:2,n:1},{s:2,f:3,n:3}],note:'Simpler shape. Open high e.'},{name:'Dsus4',fingers:[{s:3,f:2,n:1},{s:2,f:3,n:3},{s:1,f:3,n:4}],note:'Forgiving shape, great suspended sound.'}] },
+  Em: { name:'E Minor',  fingers:[{s:5,f:2,n:2},{s:4,f:2,n:3}], open:[6,3,2,1], muted:[], tip:'Easiest open chord — all 6 strings ring! Focus on arching so strings 3, 2, 1 ring crystal clear.', alts:[{name:'Em7',fingers:[{s:5,f:2,n:2}],note:'Just one finger! Remove ring finger from standard Em.'}] },
+  Am: { name:'A Minor',  fingers:[{s:4,f:2,n:2},{s:3,f:2,n:3},{s:2,f:1,n:1}], open:[5,1], muted:[6], tip:'Mute string 6 with your thumb — great practice! Arch fingers to let string 1 ring open.', alts:[{name:'Am7',fingers:[{s:4,f:2,n:2},{s:2,f:1,n:1}],note:'Remove ring finger. Mellow, jazzy sound.'},{name:'Am (bar)',fingers:[{s:4,f:2,n:1},{s:3,f:2,n:1},{s:2,f:1,n:1}],note:'Lay index flat across strings 2–4.'}] },
+  E:  { name:'E Major',  fingers:[{s:5,f:2,n:2},{s:4,f:2,n:3},{s:3,f:1,n:1}], open:[6,2,1], muted:[], tip:'All 6 strings ring! Index on string 3 fret 1 needs to arch well to let strings 2 and 1 ring open.', alts:[{name:'E7',fingers:[{s:5,f:2,n:2},{s:3,f:1,n:1}],note:'Remove ring finger. Bluesy tone.'}] },
+  F:  { name:'F Major',  fingers:[{s:2,f:1,n:1},{s:3,f:2,n:2},{s:4,f:3,n:3},{s:5,f:3,n:4}], open:[], muted:[6], tip:'The classic challenge! Keep index flat across strings 1–2. Full barre takes time — use the easy version while you build strength.', alts:[{name:'Fmaj7 (easy)',fingers:[{s:2,f:1,n:1},{s:3,f:2,n:2}],note:'Two fingers. Works as F in most pop songs.'},{name:'F (mini barre)',fingers:[{s:1,f:1,n:1},{s:2,f:1,n:1},{s:3,f:2,n:2},{s:4,f:3,n:3}],note:'Barre only strings 1–2. Most common beginner F.'}] },
+  A:  { name:'A Major',  fingers:[{s:4,f:2,n:1},{s:3,f:2,n:2},{s:2,f:2,n:3}], open:[5,1], muted:[6], tip:'Three fingers on fret 2. Angle them slightly to fit. Mute string 6 with thumb.', alts:[{name:'A (bar)',fingers:[{s:4,f:2,n:1},{s:3,f:2,n:1},{s:2,f:2,n:1}],note:'Lay index flat across strings 2–4.'},{name:'Asus2',fingers:[{s:4,f:2,n:1},{s:3,f:2,n:2}],note:'Two fingers. Bright open sound.'}] },
+  Em7: { name:'E Minor 7', fingers:[{s:5,f:2,n:2}], open:[6,4,3,2,1], muted:[], tip:'One of the easiest chords — just one finger! All 6 strings ring. The open B and e strings give it that dreamy, open quality used in Iris and Wonderwall.', alts:[{name:'Em7 (2-finger)',fingers:[{s:5,f:2,n:2},{s:4,f:2,n:3}],note:'Standard Em shape but with only those two fingers — identical to Em minus the ring.'}] },
+  Cadd9:{ name:'Cadd9',    fingers:[{s:5,f:3,n:3},{s:4,f:2,n:2},{s:2,f:3,n:4}], open:[3,1], muted:[6], tip:'The Cadd9 is essential for Iris and Wonderwall. Mute string 6. The ring and pinky land on fret 3 strings 5 and 2 — keep them arched so strings 3 and 1 ring open.', alts:[{name:'C Major',fingers:[{s:5,f:3,n:3},{s:4,f:2,n:2},{s:2,f:1,n:1}],note:'Regular C — same shape but with index on string 2 fret 1 instead of pinky on fret 3.'}] },
+  B7: { name:'B7',       fingers:[{s:5,f:2,n:1},{s:3,f:2,n:2},{s:1,f:2,n:3},{s:4,f:1,n:4}], open:[4,2], muted:[6], tip:'B7 is an important transition chord. Index anchors on string 5 fret 2 — build the rest around it.', alts:[] },
+  Bm: { name:'B Minor',  fingers:[{s:5,f:2,n:1},{s:4,f:4,n:3},{s:3,f:4,n:4},{s:2,f:3,n:2}], open:[], muted:[6,1], tip:'Tricky open Bm. Alternatively try the barre version at fret 2 if you have some barre chord experience.', alts:[{name:'Bm (capo)',fingers:[{s:5,f:2,n:1},{s:4,f:2,n:1},{s:3,f:2,n:1},{s:2,f:2,n:1},{s:1,f:2,n:1}],note:'Mini barre at fret 2. Capo on 2 + Em shape sounds like Bm.'}] },
+};
+
+// BASS power chords & notes
+const BASS_CHORDS = {
+  E:  { name:'E (open)',    fingers:[], open:[4], muted:[3,2,1], tip:'Low E open string — the foundation of bass. Let it ring fully.', alts:[] },
+  A:  { name:'A (open)',    fingers:[], open:[3], muted:[4,2,1], tip:'Open A string — one of the most used bass notes.', alts:[] },
+  D:  { name:'D (open)',    fingers:[], open:[2], muted:[4,3,1], tip:'Open D string — nice and mid-range.', alts:[] },
+  G:  { name:'G (open)',    fingers:[], open:[1], muted:[4,3,2], tip:'Highest open string on a 4-string bass.', alts:[] },
+  'E5':{ name:'E5 Power',  fingers:[{s:4,f:2,n:1},{s:3,f:2,n:2}], open:[], muted:[2,1], tip:'Power chord rooted on E. Anchor index on string 4 fret 2 (F), ring on string 3.', alts:[] },
+  'A5':{ name:'A5 Power',  fingers:[{s:3,f:2,n:1},{s:2,f:2,n:2}], open:[], muted:[4,1], tip:'Power chord rooted on A string fret 2. Classic rock/metal bass move.', alts:[] },
+};
+
+// ═══════════════════════════════════════════════════════════
+//  PATTERNS
+// ═══════════════════════════════════════════════════════════
+const PATTERNS = [
+  { id:'p1', name:'Basic Down', level:'Beginner', bpm:60, beats:['D','_','_','_','D','_','_','_'], desc:'Pure downstrokes on beats 1 and 3. Keep your wrist completely loose.', tip:'Let your wrist do the work, not your whole arm. Imagine shaking water off your fingers.' },
+  { id:'p2', name:'Down-Down-Up', level:'Beginner', bpm:70, beats:['D','_','D','_','U','_','_','_'], desc:'Your first upstroke. The up stroke should graze only the top 3–4 strings.', tip:"Don't force all 6 strings on the up — let your pick float up through the treble strings." },
+  { id:'p3', name:'D-DU-UDU', level:'Intermediate', bpm:75, beats:['D','_','D','U','U','D','U','_'], desc:'The most common pop/folk pattern. Used in thousands of songs.', tip:'Keep your hand moving even when you skip — the rhythm lives in the movement, not just the hits.' },
+  { id:'p4', name:'Island Strum', level:'Intermediate', bpm:80, beats:['D','_','D','U','_','U','D','U'], desc:'Reggae/island feel. Skipping the down on beat 3 creates that bouncy groove.', tip:'The skip on beat 3 is what gives it bounce. Keep your hand moving through the miss.' },
+  { id:'p5', name:'Fingerpick Arpeggio', level:'Advanced', bpm:65, beats:['T','_','N','_','N','_','N','_'], desc:'Thumb hits bass string, then fingers 1-2-3 pluck strings 3-2-1.', tip:'Plant thumb on bass string first. Let each note ring into the next — let them overlap.' },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  SONGS
+// ═══════════════════════════════════════════════════════════
+const SONGS = [
+  {
+    id:'iris', title:'Iris', artist:'Goo Goo Dolls', difficulty:'intermediate',
+    chords:['Em7','G','Cadd9','D'], bpm:96, pattern:'p3',
+    patternNote:'D-DU-UDU throughout. The rhythm drives everything in this song.',
+    tuning:'Standard with Capo 5', capo:5,
+    specialTuning:false, tuningNote:'',
+    activeVariant: 0,
+    variants: [
+      {
+        label:'Standard Tuning + Capo 5',
+        tuning:'Standard EADGBE + Capo 5',
+        capo:5,
+        chords:['Em7','G','Cadd9','D'],
+        tuningNote:'Standard tuning with a capo on fret 5. No retuning needed — just clip the capo on and play the shapes below. This sounds very close to the original recording.',
+        sections:[
+          { type:'intro', name:'Intro', chords:[{c:'Em7',b:4},{c:'G',b:4}], note:'Em7 and G alternating slowly. These two chords set the haunting atmosphere. Get the switch silky smooth before moving on.' },
+          { type:'verse', name:'Verse', chords:[{c:'Em7',b:4},{c:'G',b:4},{c:'Cadd9',b:4},{c:'D',b:4}], note:'Em7 → G → Cadd9 → D. The Cadd9→D transition is the trickiest — practice it in isolation.' },
+          { type:'prechorus', name:'Pre-Chorus', chords:[{c:'G',b:4},{c:'Cadd9',b:4},{c:'D',b:4},{c:'Em7',b:4}], note:'G → Cadd9 → D → Em7. Let the energy build — strum slightly harder as you approach the chorus.' },
+          { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'D',b:4},{c:'Em7',b:4},{c:'Cadd9',b:4}], note:'"And I don\'t want the world to see me..." G → D → Em7 → Cadd9. Focus on consistency and let the chords breathe.' },
+          { type:'bridge', name:'Bridge', chords:[{c:'Em7',b:8},{c:'G',b:8}], note:'Return to Em7 and G. Hold each for 8 beats. Spacious and quiet before the final chorus.' },
+        ]
+      },
+      {
+        label:'Original Tuning (BDDDDD)',
+        tuning:'Open Tuning: B D D D D D',
+        capo:0,
+        chords:['Em7','G','Cadd9','D'],
+        tuningNote:'⚠️ This requires retuning your guitar. Retune strings 6→1 to: B · D · D · D · D · D. Use the tuner tab to hit each note. This is the exact tuning used on the original recording — the open strings ring together and create that signature Iris drone sound.',
+        sections:[
+          { type:'intro', name:'Intro', chords:[{c:'Em7',b:4},{c:'G',b:4}], note:'In BDDDDD tuning the open strings already create a D drone. Em7 and G shapes here sound dramatically different — more resonant and full than standard tuning.' },
+          { type:'verse', name:'Verse', chords:[{c:'Em7',b:4},{c:'G',b:4},{c:'Cadd9',b:4},{c:'D',b:4}], note:'Em7 → G → Cadd9 → D. The chord shapes are the same as standard tuning but the open strings ringing underneath give them that iconic Iris texture.' },
+          { type:'prechorus', name:'Pre-Chorus', chords:[{c:'G',b:4},{c:'Cadd9',b:4},{c:'D',b:4},{c:'Em7',b:4}], note:'G → Cadd9 → D → Em7. In this tuning, letting strings ring open between changes adds to the sound rather than hurting it.' },
+          { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'D',b:4},{c:'Em7',b:4},{c:'Cadd9',b:4}], note:'"And I don\'t want the world to see me..." This is the closest you\'ll get to the original recording. The open D drone underneath the chords is what makes this song so distinctive.' },
+          { type:'bridge', name:'Bridge', chords:[{c:'Em7',b:8},{c:'G',b:8}], note:'Em7 and G, 8 beats each. In BDDDDD tuning this section feels especially open and expansive — strum softly and let it ring.' },
+        ]
+      }
+    ],
+    sections:[], // populated dynamically from activeVariant
+  },
+  {
+    id:'knockin', title:"Knockin' on Heaven's Door", artist:'Bob Dylan', difficulty:'beginner',
+    chords:['G','D','Am','C'], bpm:64, pattern:'p2', patternNote:'Down-Down-Up, slow and steady.', tuning:'Standard', capo:0,
+    sections:[
+      { type:'intro', name:'Intro', chords:[{c:'G',b:4},{c:'D',b:4}], note:'G and D back and forth. Just get comfortable switching.' },
+      { type:'verse', name:'Verse', chords:[{c:'G',b:4},{c:'D',b:4},{c:'G',b:4},{c:'Am',b:4}], note:'G → D → G → Am. Repeat for each line of the verse.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'D',b:4},{c:'G',b:4},{c:'C',b:4}], note:'Same G-D feel but resolves to C instead of Am.' },
+    ]
+  },
+  {
+    id:'horsenoname', title:'A Horse With No Name', artist:'America', difficulty:'beginner',
+    chords:['Em','D'], bpm:76, pattern:'p3', patternNote:'D-DU-UDU all the way through.', tuning:'Standard', capo:0,
+    sections:[
+      { type:'intro', name:'Intro', chords:[{c:'Em',b:4},{c:'D',b:4}], note:'Just 2 chords the entire song. Get the switch perfectly smooth.' },
+      { type:'verse', name:'Verse', chords:[{c:'Em',b:4},{c:'D',b:4},{c:'Em',b:4},{c:'D',b:4}], note:'Em and D alternating every 4 beats. Perfect for practicing consistent strumming.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'Em',b:4},{c:'D',b:4}], note:'Same pattern. No new chords to learn — just feel the groove.' },
+    ]
+  },
+  {
+    id:'wonderwall', title:'Wonderwall', artist:'Oasis', difficulty:'beginner',
+    chords:['Em','G','D','A'], bpm:86, pattern:'p3', patternNote:'D-DU-UDU throughout.', tuning:'Standard', capo:2,
+    sections:[
+      { type:'intro', name:'Intro', chords:[{c:'Em',b:4},{c:'G',b:4},{c:'D',b:4},{c:'A',b:4}], note:'Capo 2! Em → G → D → A.' },
+      { type:'verse', name:'Verse', chords:[{c:'Em',b:4},{c:'G',b:4},{c:'D',b:4},{c:'A',b:4}], note:'Same 4 chords. Focus on the G→D transition.' },
+      { type:'prechorus', name:'Pre-Chorus', chords:[{c:'G',b:4},{c:'Em',b:4},{c:'G',b:4},{c:'Em',b:4}], note:'G and Em back and forth. Practice this switch separately.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'Em',b:4},{c:'D',b:4},{c:'A',b:4}], note:'The big chorus! G → Em → D → A.' },
+    ]
+  },
+  {
+    id:'wishuwere', title:'Wish You Were Here', artist:'Pink Floyd', difficulty:'intermediate',
+    chords:['Em','G','A','C','D'], bpm:66, pattern:'p5', patternNote:'Fingerpicking for the intro, strumming for the body.', tuning:'Standard', capo:0,
+    sections:[
+      { type:'intro', name:'Intro Riff', chords:[{c:'Em',b:8},{c:'G',b:8}], note:'The iconic fingerpicking riff. Use thumb on low strings, fingers 1-2-3 on treble. Go very slowly at first.' },
+      { type:'verse', name:'Verse', chords:[{c:'C',b:4},{c:'D',b:4},{c:'Am',b:4},{c:'G',b:4}], note:'Switch to D-DU-UDU here. C → D → Am → G.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'Em',b:4},{c:'D',b:4},{c:'C',b:4}], note:'"We\'re just two lost souls..." G → Em → D → C.' },
+    ]
+  },
+  {
+    id:'standby', title:'Stand By Me', artist:'Ben E. King', difficulty:'beginner',
+    chords:['G','Em','C','D'], bpm:72, pattern:'p3', patternNote:'D-DU-UDU, smooth and flowing.', tuning:'Standard', capo:0,
+    sections:[
+      { type:'intro', name:'Intro', chords:[{c:'G',b:8}], note:'Hold G for 8 beats to set the feel.' },
+      { type:'verse', name:'Verse', chords:[{c:'G',b:4},{c:'Em',b:4},{c:'C',b:4},{c:'D',b:4},{c:'G',b:4}], note:'G → Em → C → D → G. The I-vi-IV-V progression — learn it once, use it forever.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'Em',b:4},{c:'C',b:4},{c:'D',b:4}], note:'Same progression. Focus on the C→D transition.' },
+    ]
+  },
+  {
+    id:'lethergo', title:'Let Her Go', artist:'Passenger', difficulty:'intermediate',
+    chords:['G','D','Em','C','Am'], bpm:100, pattern:'p3', patternNote:'D-DU-UDU. Work up to tempo — start slow.', tuning:'Standard', capo:0,
+    sections:[
+      { type:'intro', name:'Intro', chords:[{c:'C',b:4},{c:'G',b:4},{c:'D',b:4},{c:'Em',b:4}], note:'C → G → D → Em. Get this loop smooth before the verse.' },
+      { type:'verse', name:'Verse', chords:[{c:'C',b:4},{c:'G',b:4},{c:'D',b:4},{c:'Em',b:4}], note:'Same 4 chords. At 100bpm start at 70 and build up.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'G',b:4},{c:'D',b:4},{c:'Em',b:4},{c:'C',b:4}], note:'Shifted order: G → D → Em → C.' },
+      { type:'bridge', name:'Bridge', chords:[{c:'Am',b:4},{c:'C',b:4},{c:'G',b:4},{c:'D',b:4}], note:'Introduces Am. Keep index anchored on string 2 while other fingers move.' },
+    ]
+  },
+  {
+    id:'house', title:'House of the Rising Sun', artist:'The Animals', difficulty:'intermediate',
+    chords:['Am','C','D','F','E'], bpm:78, pattern:'p5', patternNote:'Fingerpicking arpeggio throughout — the iconic sound.', tuning:'Standard', capo:0,
+    sections:[
+      { type:'intro', name:'Intro', chords:[{c:'Am',b:4},{c:'C',b:4},{c:'D',b:4},{c:'F',b:4}], note:'6/8 fingerpicking. Thumb on bass string, fingers 1-2-3. Am → C → D → F.' },
+      { type:'verse', name:'Verse', chords:[{c:'Am',b:4},{c:'C',b:4},{c:'D',b:4},{c:'F',b:4},{c:'Am',b:4},{c:'E',b:4}], note:'Full verse adds E at the end. Am → C → D → F → Am → E then repeat.' },
+      { type:'chorus', name:'Chorus', chords:[{c:'Am',b:4},{c:'C',b:4},{c:'D',b:4},{c:'F',b:4},{c:'Am',b:4},{c:'E',b:4}], note:'Same as verse. Keep the arpeggio smooth through every chord change.' },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  THUMB TIPS
+// ═══════════════════════════════════════════════════════════
+const THUMB_TIPS = [
+  { title:'Why thumb muting feels hard', body:"Most players try to wrap the thumb like a capo. You only need the fleshy side to lightly rest on the low E — just enough to deaden it, not press it down." },
+  { title:"The 'thumb peek' technique", body:"Let your thumb peek just over the top of the neck so it's visible from the front. It doesn't need to go far. The tip or side rests against string 6 without pressing hard." },
+  { title:'Hand position is everything', body:"Rotate your fretting hand so the palm faces slightly toward the ceiling. This naturally brings your thumb up and over the neck. Most difficulty comes from a palm pressed too flat against the neck." },
+  { title:'Practice with D and Am', body:"D major requires muting strings 5 and 6. Am and C need string 6 muted only. Practice these slowly, verify low strings are deadened before each strum." },
+  { title:'Thumb reach is usually flexibility', body:"If your thumb can't reach, it's likely flexibility not size. Daily stretches — gently pressing your thumb toward your palm for 10 seconds — will improve reach over 2–3 weeks." },
+  { title:'The index-finger backup', body:"If your thumb still won't reach, use the underside of your index finger to lightly touch the string above it. In D major, your index on string 3 can brush string 4. Many pros use this." },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  CHORD DIAGRAM SVG
+// ═══════════════════════════════════════════════════════════
+function drawChord(chordKey, size, customChord) {
+  const chord = customChord || (currentType === 'bass' ? BASS_CHORDS[chordKey] : CHORDS[chordKey]);
+  if (!chord) {
+    var label = size === 'mini' ? 80 : 110;
+    return '<div style="width:' + label + 'px;height:' + label + 'px;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:\'Playfair Display\',serif;font-size:16px;color:var(--amber)">' + chordKey + '</div>';
+  }
+  var compact = size === 'mini';
+  var W = compact ? 108 : 150;
+  var H = compact ? 118 : 160;
+  var pL = 24, pT = 24, pR = 10, pB = 10;
+  var gW = W - pL - pR;
+  var gH = H - pT - pB;
+  var numStrings = currentType === 'bass' ? 4 : 6;
+  var ss = gW / (numStrings - 1);
+  var fs = gH / 4;
+  var validFrets = chord.fingers.filter(function(f){ return f.f > 0; }).map(function(f){ return f.f; });
+  var minF = validFrets.length ? Math.min.apply(null, validFrets) : 1;
+  var startF = minF > 1 ? minF - 1 : 0;
+
+  var svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" style="overflow:visible">';
+
+  if (startF === 0) {
+    svg += '<rect x="' + pL + '" y="' + (pT - 4) + '" width="' + gW + '" height="5" fill="#c8811a" rx="2"/>';
+  } else {
+    svg += '<text x="' + (pL - 5) + '" y="' + (pT + 7) + '" fill="#6e5e44" font-size="9" text-anchor="end">' + (startF + 1) + 'fr</text>';
+  }
+
+  for (var i = 0; i <= 4; i++) {
+    var fy = pT + i * fs;
+    svg += '<line x1="' + pL + '" y1="' + fy + '" x2="' + (pL + gW) + '" y2="' + fy + '" stroke="#3a2a18" stroke-width="' + (i === 0 ? 2 : 1) + '"/>';
+  }
+
+  for (var s = 0; s < numStrings; s++) {
+    var sx = pL + s * ss;
+    svg += '<line x1="' + sx + '" y1="' + pT + '" x2="' + sx + '" y2="' + (pT + gH) + '" stroke="#b89860" stroke-width="' + (s === 0 || s === numStrings-1 ? 1.5 : 1) + '" opacity="0.55"/>';
+  }
+
+  chord.muted.forEach(function(st) {
+    var cx = pL + (numStrings - st) * ss;
+    svg += '<line x1="' + (cx - 5) + '" y1="' + (pT - 18) + '" x2="' + (cx + 5) + '" y2="' + (pT - 8) + '" stroke="#e05050" stroke-width="2"/>';
+    svg += '<line x1="' + (cx + 5) + '" y1="' + (pT - 18) + '" x2="' + (cx - 5) + '" y2="' + (pT - 8) + '" stroke="#e05050" stroke-width="2"/>';
+  });
+
+  chord.open.forEach(function(st) {
+    var ox = pL + (numStrings - st) * ss;
+    svg += '<circle cx="' + ox + '" cy="' + (pT - 13) + '" r="5" fill="none" stroke="#c8811a" stroke-width="1.5"/>';
+  });
+
+  chord.fingers.filter(function(f){ return f.f > 0; }).forEach(function(f) {
+    var fx = pL + (numStrings - f.s) * ss;
+    var fy = pT + (f.f - startF - 1) * fs + fs / 2;
+    var r = compact ? 8 : 10;
+    var yOff = compact ? 3 : 4;
+    var fsize = compact ? 8 : 10;
+    svg += '<circle cx="' + fx + '" cy="' + fy + '" r="' + r + '" fill="#c8811a"/>';
+    svg += '<text x="' + fx + '" y="' + (fy + yOff) + '" text-anchor="middle" fill="#0d0905" font-size="' + fsize + '" font-weight="bold" font-family="DM Sans">' + f.n + '</text>';
+  });
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GUITAR TYPE UI
+// ═══════════════════════════════════════════════════════════
+function renderGuitarTypes() {
+  var html = Object.keys(GUITAR_TYPES).map(function(k) {
+    var t = GUITAR_TYPES[k];
+    return '<button class="type-btn' + (k === currentType ? ' active' : '') + '" onclick="setGuitarType(\'' + k + '\')">' + t.icon + ' ' + t.label + '</button>';
+  }).join('');
+  document.getElementById('guitarTypeRow').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TYPE-SPECIFIC CHORD OVERRIDES
+// ═══════════════════════════════════════════════════════════
+// Bass: maps common chord names → root note position on 4-string bass
+const BASS_SONG_CHORDS = {
+  G:    { name:'G (root)',   fingers:[{s:3,f:5,n:1}], open:[], muted:[4,2,1], tip:'G root note: string 3 (A string) fret 5. This is the most common G position on bass. Let it ring fully.', alts:[] },
+  C:    { name:'C (root)',   fingers:[{s:3,f:3,n:1}], open:[], muted:[4,2,1], tip:'C root note: string 3 (A string) fret 3. Anchor your index finger here.', alts:[] },
+  D:    { name:'D (root)',   fingers:[{s:3,f:5,n:1}], open:[], muted:[4,2,1], tip:'D root: string 2 (D string) open, or string 3 fret 5. The open D string is easiest.', alts:[] },
+  Em:   { name:'E (root)',   fingers:[], open:[4], muted:[3,2,1], tip:'E root note: open low E string (string 4). The lowest and most powerful note on bass.', alts:[] },
+  Em7:  { name:'E (root)',   fingers:[], open:[4], muted:[3,2,1], tip:'E root note: open low E string. For Em7 on bass, just hit the open E.', alts:[] },
+  Am:   { name:'A (root)',   fingers:[], open:[3], muted:[4,2,1], tip:'A root note: open A string (string 3). Clean and resonant.', alts:[] },
+  A:    { name:'A (root)',   fingers:[], open:[3], muted:[4,2,1], tip:'A root note: open A string (string 3).', alts:[] },
+  E:    { name:'E (root)',   fingers:[], open:[4], muted:[3,2,1], tip:'E root note: open low E string (string 4).', alts:[] },
+  F:    { name:'F (root)',   fingers:[{s:4,f:1,n:1}], open:[], muted:[3,2,1], tip:'F root: low E string fret 1. Index finger only.', alts:[] },
+  Cadd9:{ name:'C (root)',   fingers:[{s:3,f:3,n:1}], open:[], muted:[4,2,1], tip:'C root note: A string fret 3. Same position as C major root.', alts:[] },
+  B7:   { name:'B (root)',   fingers:[{s:3,f:9,n:1}], open:[], muted:[4,2,1], tip:'B root: A string fret 9, or E string fret 2. Use whichever is closer in context.', alts:[] },
+  Bm:   { name:'B (root)',   fingers:[{s:4,f:2,n:1}], open:[], muted:[3,2,1], tip:'B root: low E string fret 2. Index finger only.', alts:[] },
+};
+
+// Electric: power chord (5th chord) versions — great for rock/electric context
+const ELECTRIC_SONG_CHORDS = {
+  G:    { name:'G5 Power',   fingers:[{s:6,f:3,n:1},{s:5,f:5,n:3}], open:[], muted:[4,3,2,1], tip:'G power chord: index on string 6 fret 3, ring on string 5 fret 5. Mute strings 4–1 with your palm. Classic rock move.', alts:[] },
+  C:    { name:'C5 Power',   fingers:[{s:5,f:3,n:1},{s:4,f:5,n:3}], open:[], muted:[6,3,2,1], tip:'C power chord: index on string 5 fret 3, ring on string 4 fret 5. Mute string 6 with thumb.', alts:[] },
+  D:    { name:'D5 Power',   fingers:[{s:4,f:5,n:1},{s:3,f:7,n:3}], open:[], muted:[6,5,2,1], tip:'D power chord: index on string 4 fret 5, ring on string 3 fret 7. Or play open D position power chord.', alts:[] },
+  Em:   { name:'E5 Power',   fingers:[{s:6,f:0,n:0},{s:5,f:2,n:1}], open:[6], muted:[4,3,2,1], tip:'E power chord: open low E + index on string 5 fret 2. One of the easiest power chords on electric.', alts:[] },
+  Em7:  { name:'E5 Power',   fingers:[{s:6,f:0,n:0},{s:5,f:2,n:1}], open:[6], muted:[4,3,2,1], tip:'E power chord works great for Em7 on electric. Open E + fret 2 on A string.', alts:[] },
+  Am:   { name:'A5 Power',   fingers:[{s:5,f:0,n:0},{s:4,f:2,n:1}], open:[5], muted:[6,3,2,1], tip:'A power chord: open A + index on string 4 fret 2. Mute string 6 with thumb.', alts:[] },
+  A:    { name:'A5 Power',   fingers:[{s:5,f:0,n:0},{s:4,f:2,n:1}], open:[5], muted:[6,3,2,1], tip:'A power chord: open A string + index on D string fret 2.', alts:[] },
+  F:    { name:'F5 Power',   fingers:[{s:6,f:1,n:1},{s:5,f:3,n:3}], open:[], muted:[4,3,2,1], tip:'F power chord: index on string 6 fret 1, ring on string 5 fret 3.', alts:[] },
+  Cadd9:{ name:'C5 Power',   fingers:[{s:5,f:3,n:1},{s:4,f:5,n:3}], open:[], muted:[6,3,2,1], tip:'Cadd9 becomes C5 power chord on electric. Great for rock versions of this song.', alts:[] },
+  D5:   { name:'D5 Power',   fingers:[{s:4,f:5,n:1},{s:3,f:7,n:3}], open:[], muted:[6,5,2,1], tip:'D power chord. Index on D string fret 5, ring on G string fret 7.', alts:[] },
+};
+
+function getChordsForType(chordName) {
+  if (currentType === 'bass') return BASS_SONG_CHORDS[chordName] || null;
+  if (currentType === 'electric') return ELECTRIC_SONG_CHORDS[chordName] || CHORDS[chordName] || null;
+  return CHORDS[chordName] || null;
+}
+
+function setGuitarType(type) {
+  currentType = type;
+  renderGuitarTypes();
+  renderChordPills();
+  renderChordDetail();
+  renderStringBtns();
+  // Re-render song detail if one is open
+  if (activeSong) renderSongDetail();
+  // Update subtitle
+  var sub = document.getElementById('chordsSubtitle');
+  var info = document.getElementById('bassInfoBox');
+  if (type === 'bass') {
+    sub.textContent = 'Bass chord library — open strings, power chords, and common bass positions.';
+    info.innerHTML = '<div class="bass-info">🎵 <strong style="color:var(--cream)">Bass guitar</strong> typically plays single notes and root notes rather than full chords. These show the most common bass positions and power chord moves.</div>';
+  } else if (type === 'classical') {
+    sub.textContent = 'Tap a chord to see the fingering, tips for clean notes, and easier alternatives.';
+    info.innerHTML = '<div class="bass-info">🎼 <strong style="color:var(--cream)">Classical guitar</strong> uses the same chord shapes as acoustic. Key differences: use your fingernails for tone, keep right-hand nails slightly longer, and hold the guitar elevated on your left leg.</div>';
+  } else {
+    sub.textContent = 'Tap a chord to see the fingering, tips for clean notes, and easier alternatives.';
+    info.innerHTML = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STRUMMING
+// ═══════════════════════════════════════════════════════════
+var beatIntervals = {};
+
+function renderStrumming() {
+  var container = document.getElementById('strumPatterns');
+  var beatCls = {D:'D',U:'U',T:'T',N:'N',_:'skip'};
+  var beatSym = {D:'↓',U:'↑',T:'T',N:'♩',_:'·'};
+  container.innerHTML = PATTERNS.map(function(p) {
+    var beats = p.beats.map(function(b, i) {
+      return '<div class="beat ' + (beatCls[b] || 'skip') + '" id="beat-' + p.id + '-' + i + '">' + (beatSym[b] || '·') + '</div>';
+    }).join('');
+    return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px"><div><div class="card-title">' + p.name + '</div><div class="card-meta">' + p.level + ' &middot; ' + p.bpm + ' BPM</div></div><button class="play-btn off" id="playbtn-' + p.id + '" onclick="togglePattern(\'' + p.id + '\',' + p.bpm + ',' + p.beats.length + ')">▶ Play</button></div><div class="beat-row">' + beats + '</div><div style="font-size:13px;color:#8a7a5a;margin-bottom:8px">' + p.desc + '</div><div class="tip-box">💡 ' + p.tip + '</div></div>';
+  }).join('');
+}
+
+function togglePattern(id, bpm, len) {
+  if (beatIntervals[id]) {
+    clearInterval(beatIntervals[id]);
+    delete beatIntervals[id];
+    document.getElementById('playbtn-' + id).className = 'play-btn off';
+    document.getElementById('playbtn-' + id).textContent = '▶ Play';
+    for (var i = 0; i < len; i++) {
+      var el = document.getElementById('beat-' + id + '-' + i);
+      if (el) el.classList.remove('active');
+    }
+    return;
+  }
+  Object.keys(beatIntervals).forEach(function(k) { togglePattern(k, 0, 8); });
+  var ms = (60 / bpm) * 1000 / 2;
+  var idx = 0;
+  document.getElementById('playbtn-' + id).className = 'play-btn on';
+  document.getElementById('playbtn-' + id).textContent = '⏹ Stop';
+  beatIntervals[id] = setInterval(function() {
+    for (var i = 0; i < len; i++) {
+      var e = document.getElementById('beat-' + id + '-' + i);
+      if (e) e.classList.toggle('active', i === idx);
+    }
+    idx = (idx + 1) % len;
+  }, ms);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHORDS TAB
+// ═══════════════════════════════════════════════════════════
+var activeChord = 'G';
+var showAlts = false;
+
+function renderChordPills() {
+  var lib = currentType === 'bass' ? BASS_CHORDS : CHORDS;
+  if (!lib[activeChord]) activeChord = Object.keys(lib)[0];
+  document.getElementById('chordPills').innerHTML = Object.keys(lib).map(function(k) {
+    return '<button class="chord-pill' + (k === activeChord ? ' active' : '') + '" onclick="selectChord(\'' + k + '\')">' + k + '</button>';
+  }).join('');
+}
+
+function renderChordDetail() {
+  var lib = currentType === 'bass' ? BASS_CHORDS : CHORDS;
+  var k = activeChord;
+  var ch = lib[k];
+  if (!ch) return;
+
+  var muteTags = ch.muted.map(function(s) { return '<span class="tag tag-mute">✕ Mute: str' + s + '</span>'; }).join('');
+  var openTags = ch.open.length ? '<span class="tag tag-open">○ Open: ' + ch.open.join(',') + '</span>' : '';
+  var fingerList = ch.fingers.filter(function(f){ return f.f > 0; }).map(function(f) {
+    return 'Finger ' + f.n + ' → String ' + f.s + ' Fret ' + f.f;
+  }).join('<br>');
+
+  var altsHtml = '';
+  if (ch.alts && ch.alts.length) {
+    altsHtml = '<button class="alt-toggle" onclick="toggleAlts()">' + (showAlts ? '▾' : '▸') + ' Alternative shapes' + (showAlts ? '' : ' — if this chord is tricky') + '</button>';
+    if (showAlts) {
+      altsHtml += ch.alts.map(function(alt) {
+        return '<div class="alt-card"><div style="display:flex;gap:14px;align-items:flex-start">' + drawChord(k, 'mini', {fingers:alt.fingers, open:ch.open, muted:ch.muted, tip:''}) + '<div><div style="font-family:\'Playfair Display\',serif;font-size:15px;color:var(--amber-l);margin-bottom:5px">' + alt.name + '</div><div style="font-size:13px;color:#8a7a5a;line-height:1.6">' + alt.note + '</div></div></div></div>';
+      }).join('');
+    }
+  }
+
+  document.getElementById('chordDetail').innerHTML =
+    '<div class="chord-display"><div class="chord-layout">' + drawChord(k) +
+    '<div class="chord-info"><div class="chord-name">' + ch.name + '</div><div class="chord-tags">' + muteTags + openTags + '</div><div class="chord-fingers">' + (fingerList || '<span style="color:var(--muted)">Open string only</span>') + '</div></div></div><div class="tip-box">💡 ' + ch.tip + '</div></div>' + altsHtml;
+}
+
+function selectChord(k) { activeChord = k; showAlts = false; renderChordPills(); renderChordDetail(); }
+function toggleAlts() { showAlts = !showAlts; renderChordDetail(); }
+function jumpToChord(k) { switchTab('chords', document.querySelectorAll('.nav-btn')[1]); activeChord = k; showAlts = false; renderChordPills(); renderChordDetail(); }
+
+// ═══════════════════════════════════════════════════════════
+//  SONGS
+// ═══════════════════════════════════════════════════════════
+var activeSong = null;
+var walkStep = 0;
+
+function renderSongGrid() {
+  var diffLabel = {beginner:'Beginner', intermediate:'Intermediate', advanced:'Advanced'};
+  document.getElementById('songGrid').innerHTML = SONGS.map(function(s) {
+    return '<button class="song-card" onclick="openSong(\'' + s.id + '\')">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">' +
+      '<div class="song-card-title">' + s.title + '</div>' +
+      '<span class="diff-badge diff-' + s.difficulty + '">' + diffLabel[s.difficulty] + '</span></div>' +
+      '<div class="song-card-artist">' + s.artist + '</div>' +
+      '<div class="song-card-chords">' + s.chords.map(function(c){ return '<span class="chord-badge">' + c + '</span>'; }).join('') + '</div>' +
+      (s.specialTuning ? '<div style="font-size:10px;color:#c8811a;margin-top:7px">⚙ Special tuning</div>' : '') +
+      '</button>';
+  }).join('');
+}
+
+function openSong(id) {
+  activeSong = SONGS.find(function(s){ return s.id === id; });
+  if (!activeSong) return;
+  if (activeSong.variants) {
+    var v = activeSong.variants[activeSong.activeVariant || 0];
+    activeSong.sections = v.sections;
+    activeSong.chords = v.chords;
+    activeSong.tuning = v.tuning;
+    activeSong.capo = v.capo;
+    activeSong.tuningNote = v.tuningNote;
+  }
+  walkStep = 0;
+  document.getElementById('songLibrary').style.display = 'none';
+  renderSongDetail();
+  document.getElementById('songDetail').classList.add('visible');
+  // Verify chords unless already done
+  if (!activeSong.verified) verifyChords(activeSong);
+}
+
+function switchVariant(idx) {
+  if (!activeSong || !activeSong.variants) return;
+  activeSong.activeVariant = idx;
+  var v = activeSong.variants[idx];
+  activeSong.sections = v.sections;
+  activeSong.chords = v.chords;
+  activeSong.tuning = v.tuning;
+  activeSong.capo = v.capo;
+  activeSong.tuningNote = v.tuningNote;
+  walkStep = 0;
+  renderSongDetail();
+}
+
+function openAISong(songObj) {
+  activeSong = songObj;
+  walkStep = 0;
+  document.getElementById('songLibrary').style.display = 'none';
+  renderSongDetail();
+  document.getElementById('songDetail').classList.add('visible');
+  if (!activeSong.verified) verifyChords(activeSong);
+}
+
+// ─── CHORD VERIFICATION ────────────────────────────────────
+async function verifyChords(song) {
+  var verifyEl = document.getElementById('verifyBadge');
+  if (verifyEl) {
+    verifyEl.innerHTML = '<span style="color:var(--muted);font-size:11px"><span class="spinner"></span>Checking chords...</span>';
+  }
+
+  var prompt = 'You are a guitar chord fact-checker. Look up the actual guitar chords for "' + song.title + '" by ' + song.artist + ' using web search, then compare them to this list: ' + song.chords.join(', ') + '.\n\nRespond ONLY with valid JSON, no markdown, no backticks:\n{\n  "correct": true or false,\n  "verified_chords": ["G","D","Em"],\n  "issues": "brief description of any differences found, or empty string if correct",\n  "source": "site name you found the info from e.g. Ultimate Guitar"\n}';
+
+  try {
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var data = await response.json();
+    // Extract the text response block
+    var textBlock = data.content && data.content.filter(function(b){ return b.type === 'text'; }).pop();
+    if (!textBlock) throw new Error('no text block');
+    var clean = textBlock.text.replace(/```json|```/g, '').trim();
+    var result = JSON.parse(clean);
+
+    song.verified = true;
+    song.verifyResult = result;
+
+    // If chords differ, update the song's chord list
+    if (!result.correct && result.verified_chords && result.verified_chords.length) {
+      song.chords = result.verified_chords;
+      // Also update active variant chords if applicable
+      if (song.variants) {
+        song.variants[song.activeVariant || 0].chords = result.verified_chords;
+      }
+    }
+
+    if (activeSong && activeSong.title === song.title) renderSongDetail();
+  } catch(e) {
+    song.verified = true;
+    song.verifyResult = { correct: null, issues: 'Could not verify — check Ultimate Guitar for confirmation.', source: '' };
+    if (activeSong && activeSong.title === song.title) renderSongDetail();
+  }
+}
+
+function closeSong() {
+  document.getElementById('songDetail').classList.remove('visible');
+  document.getElementById('songLibrary').style.display = 'block';
+  activeSong = null;
+}
+
+function renderSongDetail() {
+  var s = activeSong;
+  var pat = PATTERNS.find(function(p){ return p.id === s.pattern; });
+  var patName = pat ? pat.name : (s.patternDescription || 'See strumming tab');
+
+  // Override pattern name/note per guitar type
+  var typePatternNote = '';
+  if (currentType === 'electric') {
+    patName = pat ? pat.name : patName;
+    typePatternNote = 'Use a medium pick (0.73mm). Keep your wrist loose and palm-mute for a tighter sound.';
+  } else if (currentType === 'bass') {
+    patName = 'Root Note Pattern';
+    typePatternNote = 'Play the root note of each chord on beat 1. Add a note on beat 3 for a basic walking feel. No strumming — single notes only.';
+  } else if (currentType === 'classical') {
+    patName = 'Fingerpick Arpeggio';
+    typePatternNote = 'Use thumb (p) for strings 6-5-4, index (i) for string 3, middle (m) for string 2, ring (a) for string 1. No pick.';
+  } else {
+    typePatternNote = s.patternNote || '';
+  }
+
+  var diffLabel = {beginner:'Beginner', intermediate:'Intermediate', advanced:'Advanced'};
+  var capoNote = s.capo > 0 ? '<span class="tag tag-open">Capo ' + s.capo + '</span>' : '';
+  var aiBadge = s.isAI ? '<div class="ai-badge">✦ AI Generated</div>' : '';
+
+  // Chord verification badge
+  var verifyBadgeHtml = '';
+  if (!s.verified) {
+    verifyBadgeHtml = '<span style="color:var(--muted);font-size:11px"><span class="spinner"></span>Checking chords against web sources...</span>';
+  } else if (s.verifyResult) {
+    var r = s.verifyResult;
+    if (r.correct === true) {
+      verifyBadgeHtml = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--green);background:#1a3a1a;border:1px solid #3a6a3a;padding:4px 10px;border-radius:20px">✓ Chords verified' + (r.source ? ' via ' + r.source : '') + '</span>';
+    } else if (r.correct === false) {
+      verifyBadgeHtml = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#c8b840;background:#2a2a0a;border:1px solid #5a5a1a;padding:4px 10px;border-radius:20px">⚠ Chords updated' + (r.source ? ' via ' + r.source : '') + (r.issues ? ' — ' + r.issues : '') + '</span>';
+    } else {
+      verifyBadgeHtml = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);background:var(--bg3);border:1px solid var(--dim);padding:4px 10px;border-radius:20px">? ' + (r.issues || 'Could not verify') + '</span>';
+    }
+  }
+
+  var variantToggle = '';
+  if (activeSong.variants && activeSong.variants.length > 1) {
+    var activeV = activeSong.activeVariant || 0;
+    variantToggle = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;margin-bottom:2px">' +
+      activeSong.variants.map(function(v, i) {
+        var isActive = i === activeV;
+        return '<button onclick="switchVariant(' + i + ')" style="padding:6px 13px;border-radius:20px;border:1.5px solid ' + (isActive ? 'var(--amber)' : 'var(--dim)') + ';background:' + (isActive ? '#c8811a22' : 'transparent') + ';color:' + (isActive ? 'var(--amber-xl)' : 'var(--muted)') + ';font-family:\'DM Sans\';font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">' +
+          (isActive ? '● ' : '○ ') + v.label + '</button>';
+      }).join('') +
+      '</div>';
+  }
+
+  var tuningNote = activeSong.tuningNote || '';
+  var tuningAlert = tuningNote ? '<div class="tuning-alert" style="margin-top:10px">⚙ ' + tuningNote + '</div>' : '';
+
+  var typeLabel = {acoustic:'🎸 Acoustic', electric:'⚡ Electric', bass:'🎵 Bass', classical:'🎼 Classical'}[currentType];
+  var chordGrid = '<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Chords for this song <span style="color:var(--amber);letter-spacing:0;text-transform:none;font-size:11px;font-weight:500">— ' + typeLabel + '</span></div>' +
+    '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+    s.chords.map(function(c) {
+      var customChord = s.chordData && s.chordData[c] ? s.chordData[c] : null;
+      var chObj = customChord || getChordsForType(c);
+      var name = chObj ? chObj.name : c;
+      var diagramHtml = drawChord(c, 'mini', customChord || chObj);
+      return '<div onclick="openChordModalTyped(\'' + c + '\')" style="text-align:center;cursor:pointer;background:var(--bg3);border-radius:10px;padding:10px 8px 8px;border:1px solid var(--dim);transition:border-color .2s;flex-shrink:0" onmouseover="this.style.borderColor=\'var(--amber)\'" onmouseout="this.style.borderColor=\'var(--dim)\'">' +
+        diagramHtml +
+        '<div style="font-family:\'Playfair Display\',serif;font-size:14px;color:var(--amber-l);margin-top:6px">' + c + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);margin-top:1px">' + name + '</div>' +
+        '</div>';
+    }).join('') +
+    '</div>';
+
+  var sections = s.sections.map(function(sec, i) {
+    var isCurrent = i === walkStep;
+    var chordSeq = sec.chords.map(function(item) {
+      return '<div class="seq-chord' + (isCurrent ? ' highlighted' : '') + '" onclick="openChordModal(\'' + item.c + '\')">' + item.c + '<span class="beat-count">' + item.b + ' beats</span></div>';
+    }).join('');
+    var statusIcon = isCurrent ? '<span class="current-badge">NOW</span>' : (i < walkStep ? '<span style="color:var(--green);font-size:16px">✓</span>' : '<span style="color:var(--muted);font-size:18px">›</span>');
+    return '<div class="walkthrough-section' + (isCurrent ? ' current open' : '') + '" id="wt-sec-' + i + '">' +
+      '<div class="section-header" onclick="toggleSection(' + i + ')">' +
+      '<div><div class="section-label ' + sec.type + '">' + sec.type.toUpperCase() + '</div><div class="section-name">' + sec.name + '</div></div>' +
+      statusIcon + '</div>' +
+      '<div class="section-body"><div class="chord-sequence">' + chordSeq + '</div>' +
+      '<div class="section-instructions">' + sec.note + '</div></div></div>';
+  }).join('');
+
+  var progress = Math.round((walkStep / s.sections.length) * 100);
+  var isComplete = walkStep === s.sections.length - 1;
+
+  document.getElementById('songDetail').innerHTML =
+    '<button class="back-btn" onclick="closeSong()">← Back to Songs</button>' +
+    aiBadge +
+    '<div class="song-header">' +
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start">' +
+    '<div><div class="song-title-big">' + s.title + '</div><div class="song-artist-big">' + s.artist + '</div></div>' +
+    '<span class="diff-badge diff-' + s.difficulty + '" style="margin-top:4px">' + diffLabel[s.difficulty] + '</span></div>' +
+    variantToggle +
+    '<div class="song-meta-row" style="margin-top:12px"><span class="tag tag-open">' + s.bpm + ' BPM</span>' + capoNote +
+    '<span class="tag tag-info">' + s.tuning + '</span></div>' +
+    '<div id="verifyBadge" style="margin-bottom:12px">' + verifyBadgeHtml + '</div>' +
+    tuningAlert +
+    chordGrid +
+    '<div class="tip-box" style="margin-top:14px;margin-bottom:0">🎸 <strong>' + patName + '</strong> — ' + typePatternNote + '</div>' +
+    '</div>' +
+    '<div class="progress-bar"><div class="progress-fill" style="width:' + progress + '%"></div></div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:14px;text-align:center">Section ' + (walkStep + 1) + ' of ' + s.sections.length + '</div>' +
+    sections +
+    '<div class="walkthrough-controls">' +
+    '<button class="wt-btn wt-prev" onclick="walkPrev()"' + (walkStep === 0 ? ' disabled' : '') + '>← Prev</button>' +
+    '<button class="wt-btn wt-next" onclick="walkNext()"' + (isComplete ? ' disabled' : '') + '>Next →</button>' +
+    '</div>' +
+    '<button onclick="openGameMode()" style="width:100%;margin-top:10px;padding:14px;background:linear-gradient(135deg,#1a0f05,#2a1a08);border:1.5px solid var(--amber);border-radius:12px;color:var(--amber-xl);font-family:\'DM Sans\';font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .2s" onmouseover="this.style.background=\'#c8811a18\'" onmouseout="this.style.background=\'linear-gradient(135deg,#1a0f05,#2a1a08)\'">🎮 Game Mode — Practice with the beat</button>' +
+    (isComplete ? '<div style="text-align:center;font-family:\'Playfair Display\',serif;font-size:18px;color:var(--amber-l);margin-top:12px">🎉 You\'ve worked through the whole song!</div>' : '');
+}
+
+function toggleSection(i) {
+  var el = document.getElementById('wt-sec-' + i);
+  if (el) el.classList.toggle('open');
+}
+
+function walkNext() { if (walkStep < activeSong.sections.length - 1) { walkStep++; renderSongDetail(); window.scrollTo({top: document.getElementById('songDetail').offsetTop - 80, behavior: 'smooth'}); } }
+function walkPrev() { if (walkStep > 0) { walkStep--; renderSongDetail(); window.scrollTo({top: document.getElementById('songDetail').offsetTop - 80, behavior: 'smooth'}); } }
+
+// ═══════════════════════════════════════════════════════════
+//  AI SONG SEARCH
+// ═══════════════════════════════════════════════════════════
+async function searchSong() {
+  var query = document.getElementById('songSearch').value.trim();
+  if (!query) return;
+  var btn = document.getElementById('searchBtn');
+  var area = document.getElementById('aiResultArea');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Searching...';
+  area.innerHTML = '<div class="ai-result"><span class="spinner"></span> Asking AI for chord chart...</div>';
+
+  var prompt = 'You are a guitar teacher. Generate a chord chart and learning walkthrough for the song: "' + query + '".\n\nRespond ONLY with valid JSON, no markdown, no backticks, no explanation. Use this exact structure:\n{\n  "title": "song title",\n  "artist": "artist name",\n  "difficulty": "beginner" or "intermediate" or "advanced",\n  "tuning": "Standard" or describe tuning,\n  "capo": 0,\n  "bpm": 120,\n  "patternDescription": "e.g. D-DU-UDU",\n  "patternNote": "brief tip about the strumming",\n  "chords": ["G","D","Em"],\n  "chordData": {\n    "G": {"name":"G Major","fingers":[{"s":6,"f":3,"n":2},{"s":5,"f":2,"n":1},{"s":1,"f":3,"n":4}],"open":[4,3,2],"muted":[],"tip":"tip text","alts":[]}\n  },\n  "tuningNote": "optional note if special tuning",\n  "sections": [\n    {"type":"intro","name":"Intro","chords":[{"c":"G","b":4},{"c":"D","b":4}],"note":"instruction text"}\n  ]\n}\n\nRules:\n- type must be one of: intro, verse, prechorus, chorus, bridge, outro\n- Include 3-6 sections typical for the song structure\n- Each section note should be 1-2 sentences of beginner-friendly advice\n- chordData should include ALL chords in the chords array\n- fingers: s=string(6=low E), f=fret, n=finger number(1=index)\n- open: array of string numbers that ring open\n- muted: array of string numbers that must be muted';
+
+  try {
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    var data = await response.json();
+    var text = data.content && data.content[0] ? data.content[0].text : '';
+    var clean = text.replace(/```json|```/g, '').trim();
+    var song = JSON.parse(clean);
+    song.id = 'ai_' + Date.now();
+    song.isAI = true;
+    song.pattern = 'p3';
+
+    var diffLabel = {beginner:'Beginner', intermediate:'Intermediate', advanced:'Advanced'};
+    area.innerHTML = '<div class="ai-result">' +
+      '<div class="ai-badge">✦ AI Generated</div>' +
+      '<div style="font-family:\'Playfair Display\',serif;font-size:20px;color:var(--amber-xl);margin-bottom:2px">' + song.title + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:12px">' + song.artist + ' &middot; <span class="diff-badge diff-' + song.difficulty + '">' + diffLabel[song.difficulty] + '</span></div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">' + song.chords.map(function(c){ return '<span class="chord-badge">' + c + '</span>'; }).join('') + '</div>' +
+      '<button onclick="openAISong(' + JSON.stringify(song).replace(/'/g, "&#39;").replace(/"/g, '&quot;') + ')" style="width:100%;padding:13px;background:var(--amber);border:none;border-radius:10px;color:#0d0905;font-family:\'DM Sans\';font-size:14px;font-weight:700;cursor:pointer">Start Learning →</button>' +
+      '</div>';
+  } catch (e) {
+    area.innerHTML = '<div class="ai-result" style="color:#e05050">Couldn\'t load that song — try rephrasing (e.g. "Creep by Radiohead") or check your connection.</div>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✦ Learn It';
+}
+
+document.getElementById('songSearch').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') searchSong();
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CHORD MODAL
+// ═══════════════════════════════════════════════════════════
+function openChordModal(key) {
+  var lib = currentType === 'bass' ? BASS_CHORDS : CHORDS;
+  var ch = null;
+  if (activeSong && activeSong.chordData && activeSong.chordData[key]) {
+    ch = activeSong.chordData[key];
+  } else {
+    ch = lib[key];
+  }
+  document.getElementById('modalTitle').textContent = (ch ? ch.name : key);
+  document.getElementById('modalDiagram').innerHTML = drawChord(key, 'normal', ch && !lib[key] ? ch : null);
+  document.getElementById('modalTip').textContent = ch ? '💡 ' + ch.tip : 'Tap the Chords tab for more detail on this chord.';
+  document.getElementById('chordModal').classList.add('open');
+}
+
+function openChordModalTyped(key) {
+  var ch = null;
+  if (activeSong && activeSong.chordData && activeSong.chordData[key]) {
+    ch = activeSong.chordData[key];
+  } else {
+    ch = getChordsForType(key);
+  }
+  document.getElementById('modalTitle').textContent = ch ? ch.name : key;
+  document.getElementById('modalDiagram').innerHTML = drawChord(key, 'normal', ch);
+  document.getElementById('modalTip').textContent = ch ? '💡 ' + ch.tip : 'Tap the Chords tab for more detail.';
+  document.getElementById('chordModal').classList.add('open');
+}
+function closeModal() { document.getElementById('chordModal').classList.remove('open'); }
+document.getElementById('chordModal').addEventListener('click', function(e) { if (e.target === document.getElementById('chordModal')) closeModal(); });
+
+// ═══════════════════════════════════════════════════════════
+//  TUNER
+// ═══════════════════════════════════════════════════════════
+var audioCtx = null;
+var analyser = null;
+var micStream = null;
+var tunerRunning = false;
+var tunerRaf = null;
+var targetStringIdx = -1;
+
+var NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+function freqToNote(freq) {
+  if (!freq || freq < 20) return null;
+  var noteNum = 12 * Math.log2(freq / 440) + 69;
+  var rounded = Math.round(noteNum);
+  var cents = Math.round((noteNum - rounded) * 100);
+  var octave = Math.floor(rounded / 12) - 1;
+  var name = NOTE_NAMES[((rounded % 12) + 12) % 12];
+  var targetFreq = 440 * Math.pow(2, (rounded - 69) / 12);
+  return { name: name, octave: octave, cents: cents, targetFreq: targetFreq };
+}
+
+function autoCorrelate(buf, sampleRate) {
+  var SIZE = buf.length;
+  var rms = 0;
+  for (var i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.008) return -1;
+
+  var r1 = 0, r2 = SIZE - 1;
+  var thres = 0.2;
+  for (var i2 = 0; i2 < SIZE / 2; i2++) { if (Math.abs(buf[i2]) < thres) { r1 = i2; break; } }
+  for (var i3 = 1; i3 < SIZE / 2; i3++) { if (Math.abs(buf[SIZE - i3]) < thres) { r2 = SIZE - i3; break; } }
+  var trimmed = buf.slice(r1, r2);
+  var c = new Array(trimmed.length).fill(0);
+  for (var i4 = 0; i4 < trimmed.length; i4++) {
+    for (var j = 0; j < trimmed.length - i4; j++) c[i4] += trimmed[j] * trimmed[j + i4];
+  }
+  var d = 0;
+  while (c[d] > c[d + 1]) d++;
+  var maxval = -1, maxpos = -1;
+  for (var i5 = d; i5 < trimmed.length; i5++) { if (c[i5] > maxval) { maxval = c[i5]; maxpos = i5; } }
+  var T0 = maxpos;
+  var x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+  var a = (x1 + x3 - 2 * x2) / 2;
+  var b2 = (x3 - x1) / 2;
+  if (a) T0 = T0 - b2 / (2 * a);
+  return sampleRate / T0;
+}
+
+async function toggleTuner() {
+  if (tunerRunning) {
+    stopTuner();
+    return;
+  }
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    micStream = stream;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    var source = audioCtx.createMediaStreamSource(stream);
+    source.connect(analyser);
+    tunerRunning = true;
+    document.getElementById('micBtn').className = 'mic-btn listening';
+    document.getElementById('micBtn').textContent = '⏹ Stop Tuning';
+    document.getElementById('tunerStatus').textContent = 'Listening... play a string';
+    tunerLoop();
+  } catch(e) {
+    document.getElementById('tunerStatus').textContent = 'Mic access denied. Please allow microphone in browser settings.';
+  }
+}
+
+function stopTuner() {
+  tunerRunning = false;
+  if (tunerRaf) cancelAnimationFrame(tunerRaf);
+  if (micStream) micStream.getTracks().forEach(function(t){ t.stop(); });
+  if (audioCtx) audioCtx.close();
+  document.getElementById('micBtn').className = 'mic-btn';
+  document.getElementById('micBtn').textContent = '🎙 Start Tuning';
+  document.getElementById('tunerNote').textContent = '—';
+  document.getElementById('tunerFreq').textContent = '— Hz';
+  document.getElementById('tunerCents').textContent = '';
+  document.getElementById('tunerStatus').textContent = 'Tap the button and allow microphone access';
+  document.getElementById('tunerNeedle').style.left = '50%';
+  document.getElementById('tunerBarFill').style.cssText = 'width:4px;left:50%;background:var(--amber)';
+}
+
+function tunerLoop() {
+  if (!tunerRunning) return;
+  var buf = new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  var freq = autoCorrelate(buf, audioCtx.sampleRate);
+
+  if (freq > 0) {
+    var note = freqToNote(freq);
+    if (note) {
+      document.getElementById('tunerNote').textContent = note.name + note.octave;
+      document.getElementById('tunerFreq').textContent = freq.toFixed(1) + ' Hz';
+
+      var cents = note.cents;
+      var inTune = Math.abs(cents) < 5;
+      var pct = Math.min(Math.max((cents + 50) / 100, 0), 1);
+      var needleLeft = (pct * 100).toFixed(1) + '%';
+      document.getElementById('tunerNeedle').style.left = needleLeft;
+
+      var color = inTune ? 'var(--green)' : (cents < 0 ? 'var(--blue)' : 'var(--red)');
+      var barW = Math.abs(cents) / 50 * 50;
+      var barLeft = cents < 0 ? (50 - barW) : 50;
+      document.getElementById('tunerBarFill').style.cssText = 'width:' + barW + '%;left:' + barLeft + '%;background:' + color;
+      document.getElementById('tunerNeedle').style.background = color;
+
+      var centsEl = document.getElementById('tunerCents');
+      if (inTune) {
+        centsEl.className = 'tuner-cents cents-intune';
+        centsEl.textContent = '✓ In tune!';
+      } else if (cents < 0) {
+        centsEl.className = 'tuner-cents cents-flat';
+        centsEl.textContent = cents + ' cents — tune UP ↑';
+      } else {
+        centsEl.className = 'tuner-cents cents-sharp';
+        centsEl.textContent = '+' + cents + ' cents — tune DOWN ↓';
+      }
+
+      // Check if matches target string
+      if (targetStringIdx >= 0) {
+        var gt = GUITAR_TYPES[currentType];
+        var targetFreq = gt.freqs[targetStringIdx];
+        var diff = Math.abs(freq - targetFreq);
+        if (diff < targetFreq * 0.03) {
+          document.getElementById('tunerStatus').textContent = inTune ? ('✓ String ' + gt.strings[targetStringIdx] + ' is in tune!') : ('String ' + gt.strings[targetStringIdx] + ': ' + (cents < 0 ? 'tune up' : 'tune down'));
+        }
+      }
+    }
+  } else {
+    document.getElementById('tunerNote').textContent = '—';
+    document.getElementById('tunerFreq').textContent = '— Hz';
+    document.getElementById('tunerCents').textContent = '';
+  }
+
+  tunerRaf = requestAnimationFrame(tunerLoop);
+}
+
+function setSpecialTuning(preset) {
+  var btn = document.getElementById('bdddddBtn');
+  if (preset === 'bddddd') {
+    // Override string display with B D D D D D
+    var notes = ['B','D','D','D','D','D'];
+    var freqs = [61.74, 73.42, 73.42, 73.42, 73.42, 73.42]; // B2, D3, D3, D3, D3, D3
+    targetStringIdx = -1;
+    btn.style.borderColor = 'var(--amber)';
+    btn.style.color = 'var(--amber-l)';
+    document.getElementById('stringRefTitle').textContent = 'Iris Original Tuning — B D D D D D';
+    document.getElementById('stringBtns').innerHTML = notes.map(function(n, i) {
+      return '<button class="string-btn" onclick="setSpecialString(' + i + ',' + freqs[i] + ',\'' + n + '\')" style="min-width:44px">' + n + '<span class="string-num">str ' + (6 - i) + '</span></button>';
+    }).join('');
+  }
+}
+
+function setSpecialString(i, freq, note) {
+  targetStringIdx = i;
+  var btns = document.getElementById('stringBtns').querySelectorAll('.string-btn');
+  btns.forEach(function(b, idx) { b.classList.toggle('target', idx === i); });
+  if (tunerRunning) {
+    document.getElementById('tunerStatus').textContent = 'Play string ' + (6 - i) + ' — tune to ' + note + ' (' + freq.toFixed(1) + ' Hz)';
+  }
+}
+
+function renderStringBtns() {
+  var gt = GUITAR_TYPES[currentType];
+  document.getElementById('stringRefTitle').textContent = gt.tuning + ' — String Reference';
+  document.getElementById('stringBtns').innerHTML = gt.strings.map(function(n, i) {
+    var isTarget = i === targetStringIdx;
+    var strNum = gt.count - i;
+    return '<button class="string-btn' + (isTarget ? ' target' : '') + '" onclick="setTargetString(' + i + ')">' + n + '<span class="string-num">str ' + strNum + '</span></button>';
+  }).join('');
+}
+
+function setTargetString(i) {
+  targetStringIdx = targetStringIdx === i ? -1 : i;
+  renderStringBtns();
+  if (targetStringIdx >= 0 && tunerRunning) {
+    var gt = GUITAR_TYPES[currentType];
+    document.getElementById('tunerStatus').textContent = 'Play string ' + (gt.count - i) + ' (' + gt.strings[i] + ') — ' + gt.freqs[i].toFixed(1) + ' Hz';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  THUMB TIPS
+// ═══════════════════════════════════════════════════════════
+function renderThumbTips() {
+  document.getElementById('thumbTips').innerHTML = THUMB_TIPS.map(function(t, i) {
+    return '<div class="tip-card"><div class="tip-num">' + (i + 1) + '</div><div><div class="tip-title">' + t.title + '</div><div class="tip-body">' + t.body + '</div></div></div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════════════
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id !== 'strum') Object.keys(beatIntervals).forEach(function(k){ togglePattern(k, 0, 8); });
+  if (id === 'tuner') renderStringBtns();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  GAME MODE — LYRICS TAB STYLE
+// ═══════════════════════════════════════════════════════════
+
+var gm = {
+  mode: 'beginner',
+  running: false,
+  segIdx: 0,           // current segment index in flat segment list
+  segments: [],        // flat list: {chord, text, isChordChange, sectionLabel, el}
+  audioCtx: null,
+  micStream: null,
+  micAnalyser: null,
+  waiting: false,
+  intTimer: null,
+  tempoFactor: 0.75,
+};
+
+// Root frequencies for chord detection (Hz, fundamental)
+var CHORD_ROOTS = {
+  G:98.0, C:130.81, D:146.83, Em:82.41, Am:110.0,
+  E:82.41, F:87.31, A:110.0, Em7:82.41, Cadd9:130.81,
+  Bm:123.47, B7:123.47, Dm:146.83, Fm:174.61,
+  G5:98.0, E5:82.41, A5:110.0, C5:130.81, D5:146.83,
+};
+
+// ─── Lyrics AI fetch ─────────────────────────────────────
+async function fetchLyrics(song) {
+  var panel = document.getElementById('gameLyricsPanel');
+  panel.innerHTML = '<div class="game-loading"><span class="spinner"></span>Looking up lyrics & chords...</div>';
+
+  var prompt = 'Search the web for the lyrics and guitar chords for "' + song.title + '" by ' + song.artist + '.\n\nFormat the result EXACTLY like a guitar tab on Ultimate Guitar: chord names float above the lyric syllable/word where the chord changes.\n\nRespond ONLY with valid JSON (no markdown, no backticks, no explanation):\n{\n  "sections": [\n    {\n      "label": "Intro",\n      "lines": [\n        [\n          {"chord":"Em7", "text":"And I\'d give up "},\n          {"chord":"",    "text":"forever "},\n          {"chord":"G",   "text":"to touch you "}\n        ],\n        [\n          {"chord":"Cadd9","text":"\'Cause I know that you "},\n          {"chord":"",     "text":"feel me "},\n          {"chord":"D",    "text":"somehow "}\n        ]\n      ]\n    }\n  ]\n}\n\nSTRICT RULES:\n- "chord" is the chord name when the guitarist must switch, or "" if no change at that word\n- "text" is the actual lyric words (NOT chord names, NOT beat counts)\n- Each line array represents one line of lyrics\n- Include real lyrics — not placeholders like "4 beats" or chord names as text\n- Cover all sections: intro, verse 1, pre-chorus, chorus, verse 2, bridge, outro\n- A segment text should be 1-5 words of actual lyrics';
+
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        tools: [{type: 'web_search_20250305', name: 'web_search'}],
+        messages: [{role: 'user', content: prompt}]
+      })
+    });
+    var data = await resp.json();
+    // Find the last text block (after tool use)
+    var textBlock = null;
+    if (data.content) {
+      for (var i = data.content.length - 1; i >= 0; i--) {
+        if (data.content[i].type === 'text') { textBlock = data.content[i]; break; }
+      }
+    }
+    if (!textBlock || !textBlock.text) throw new Error('no text block');
+    var raw = textBlock.text.trim();
+    // Strip markdown fences if present
+    raw = raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    // Find JSON object
+    var jsonStart = raw.indexOf('{');
+    var jsonEnd = raw.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) throw new Error('no JSON found');
+    var result = JSON.parse(raw.slice(jsonStart, jsonEnd + 1));
+    if (!result.sections || !result.sections.length) throw new Error('empty sections');
+    // Validate — make sure text fields are real lyrics not beat counts
+    song.lyricsData = result.sections;
+    renderLyricsPanel(song);
+  } catch(e) {
+    console.error('Lyrics fetch failed:', e);
+    // Clean fallback: show chord chart with "♩" beat markers instead of ugly brackets
+    var sections = [];
+    song.sections.forEach(function(sec) {
+      var line = [];
+      sec.chords.forEach(function(item, ci) {
+        // Show chord above a row of beat dots (♩ per beat)
+        var dots = '';
+        for (var b = 0; b < (item.b || 4); b++) dots += '♩  ';
+        line.push({chord: item.c, text: dots.trim() + '  '});
+      });
+      sections.push({label: sec.name + ' (' + sec.type + ')', lines: [line]});
+    });
+    song.lyricsData = sections;
+    panel.innerHTML = '<div style="padding:10px 0 14px;font-size:11px;color:#c8811a;background:#2a1508;border-radius:8px;text-align:center;margin-bottom:14px">⚠ Lyrics not found — showing chord chart. Tap a segment to advance.</div>';
+    renderLyricsPanel(song, true);
+  }
+}
+
+// ─── Render lyrics panel ──────────────────────────────────
+function renderLyricsPanel(song, append) {
+  gm.segments = [];
+  var panel = document.getElementById('gameLyricsPanel');
+  if (!append) panel.innerHTML = '';
+
+  song.lyricsData.forEach(function(sec) {
+    // Section header
+    var hdr = document.createElement('div');
+    hdr.className = 'game-section-header';
+    hdr.textContent = '[' + sec.label + ']';
+    panel.appendChild(hdr);
+
+    sec.lines.forEach(function(line) {
+      // Each line rendered as two rows: chords row + lyrics row
+      // We use a container with position:relative for alignment
+      var lineWrap = document.createElement('div');
+      lineWrap.className = 'game-lyric-line';
+
+      line.forEach(function(seg) {
+        var segEl = document.createElement('div');
+        segEl.className = 'game-segment';
+
+        // Chord label row
+        var chordEl = document.createElement('span');
+        chordEl.className = 'game-chord-label' + (seg.chord ? ' has-chord' : '');
+        chordEl.textContent = seg.chord || '';
+        segEl.appendChild(chordEl);
+
+        // Lyric text row
+        var textEl = document.createElement('span');
+        textEl.className = 'game-lyric-text';
+        textEl.textContent = seg.text;
+        segEl.appendChild(textEl);
+
+        lineWrap.appendChild(segEl);
+
+        gm.segments.push({
+          chord: seg.chord || '',
+          text: seg.text,
+          isStop: !!seg.chord,
+          el: segEl,
+          chordEl: chordEl,
+          textEl: textEl,
+        });
+      });
+
+      panel.appendChild(lineWrap);
+    });
+
+    // Blank line between sections
+    var spacer = document.createElement('div');
+    spacer.style.height = '8px';
+    panel.appendChild(spacer);
+  });
+
+  panel.scrollTop = 0;
+  updateHUD();
+}
+
+function getActiveSegments() {
+  return gm.segments.filter(function(s){ return s.isStop; });
+}
+
+// ─── Mode ─────────────────────────────────────────────────
+function setGameMode(mode) {
+  gm.mode = mode;
+  var bBtn = document.getElementById('modeBeginner');
+  var iBtn = document.getElementById('modeIntermediate');
+  var tempoRow = document.getElementById('gameTempoRow');
+  bBtn.className = 'game-mode-btn' + (mode==='beginner' ? ' active-beginner' : '');
+  iBtn.className = 'game-mode-btn' + (mode==='intermediate' ? ' active-intermediate' : '');
+  tempoRow.style.display = mode==='intermediate' ? 'flex' : 'none';
+}
+
+// ─── Open game ────────────────────────────────────────────
+function openGameMode() {
+  if (!activeSong) return;
+  gm.running = false;
+  gm.waiting = false;
+  gm.segIdx = 0;
+  if (gm.intTimer) clearInterval(gm.intTimer);
+
+  document.getElementById('gameTitle').textContent = activeSong.title + ' — ' + activeSong.artist;
+  document.getElementById('gamePlayBtn').className = 'game-play-btn play';
+  document.getElementById('gamePlayBtn').textContent = '▶ Start';
+  document.getElementById('hudStatus').textContent = 'Press Start to begin';
+  document.getElementById('hudMic').style.display = 'none';
+  document.getElementById('gameCountOverlay').style.display = 'none';
+  document.getElementById('gameOverlay').classList.add('open');
+  setGameMode(gm.mode);
+
+  // Use cached lyrics or fetch
+  if (activeSong.lyricsData) {
+    renderLyricsPanel(activeSong);
+  } else {
+    fetchLyrics(activeSong);
+  }
+}
+
+function stopGame() {
+  gm.running = false;
+  gm.waiting = false;
+  if (gm.intTimer) clearInterval(gm.intTimer);
+  stopGameMic();
+  document.getElementById('gameOverlay').classList.remove('open');
+}
+
+function updateTempo(val) {
+  gm.tempoFactor = val / 100;
+  document.getElementById('tempoVal').textContent = val + '%';
+}
+
+// ─── Play/pause ───────────────────────────────────────────
+function toggleGamePlay() {
+  if (gm.running) {
+    gm.running = false;
+    gm.waiting = false;
+    if (gm.intTimer) clearInterval(gm.intTimer);
+    document.getElementById('gamePlayBtn').className = 'game-play-btn play';
+    document.getElementById('gamePlayBtn').textContent = '▶ Resume';
+    document.getElementById('hudStatus').textContent = 'Paused';
+    document.getElementById('hudMic').style.display = 'none';
+  } else {
+    startCountIn();
+  }
+}
+
+function startCountIn() {
+  var count = 4;
+  var overlay = document.getElementById('gameCountOverlay');
+  var numEl = document.getElementById('gameCountNum');
+  overlay.style.display = 'flex';
+  numEl.textContent = count;
+  ensureGameAudio();
+  var iv = setInterval(function() {
+    // Metronome click
+    var osc = gm.audioCtx.createOscillator();
+    var g = gm.audioCtx.createGain();
+    osc.frequency.value = count <= 1 ? 880 : 660;
+    g.gain.setValueAtTime(0.25, gm.audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, gm.audioCtx.currentTime + 0.09);
+    osc.connect(g); g.connect(gm.audioCtx.destination);
+    osc.start(); osc.stop(gm.audioCtx.currentTime + 0.1);
+    count--;
+    if (count <= 0) {
+      clearInterval(iv);
+      overlay.style.display = 'none';
+      document.getElementById('gamePlayBtn').className = 'game-play-btn pause';
+      document.getElementById('gamePlayBtn').textContent = '⏸ Pause';
+      gm.running = true;
+      gm.segIdx = 0;
+      clearAllHighlights();
+      if (gm.mode === 'beginner') {
+        startGameMic().then(function(){ advanceToSegment(0); });
+      } else {
+        advanceToSegment(0);
+        startIntermediateTimer();
+      }
+    } else {
+      numEl.textContent = count;
+      numEl.style.animation = 'none'; void numEl.offsetWidth; numEl.style.animation = 'countIn .3s ease';
+    }
+  }, 700);
+}
+
+// ─── Highlight helpers ────────────────────────────────────
+function clearAllHighlights() {
+  gm.segments.forEach(function(s) { if (s.el) s.el.className = 'game-segment'; });
+}
+
+function scrollToSegment(el) {
+  var panel = document.getElementById('gameLyricsPanel');
+  var elTop = el.getBoundingClientRect().top;
+  var panelTop = panel.getBoundingClientRect().top;
+  var offset = elTop - panelTop - panel.offsetHeight * 0.35;
+  panel.scrollBy({top: offset, behavior: 'smooth'});
+}
+
+function startIntermediateTimer() {
+  if (gm.intTimer) clearInterval(gm.intTimer);
+  var song = activeSong;
+  var msPerBeat = (60 / (song.bpm || 80)) * 1000 * (1 / gm.tempoFactor);
+  var tickMs = msPerBeat * 1.2; // slightly slower per segment for readability
+
+  gm.intTimer = setInterval(function() {
+    if (!gm.running) { clearInterval(gm.intTimer); return; }
+    var cur = gm.segments[gm.segIdx];
+    if (cur && cur.el) cur.el.className = 'game-segment played';
+    var next = gm.segIdx + 1;
+    if (next >= gm.segments.length) { clearInterval(gm.intTimer); gameDone(); return; }
+    gm.segIdx = next;
+    var seg = gm.segments[next];
+    if (seg) {
+      if (seg.el) {
+        seg.el.className = 'game-segment current';
+        scrollToSegment(seg.el);
+      }
+      if (seg.chord) playGameChord(seg.chord);
+      updateHUD();
+    }
+  }, tickMs);
+}
+
+function advanceToSegment(idx) {
+  if (!gm.running) return;
+
+  // Mark everything before as played
+  for (var i = 0; i < idx; i++) {
+    if (gm.segments[i] && gm.segments[i].el) gm.segments[i].el.className = 'game-segment played';
+  }
+  // Clear everything from idx onward
+  for (var j = idx; j < gm.segments.length; j++) {
+    if (gm.segments[j] && gm.segments[j].el) gm.segments[j].el.className = 'game-segment';
+  }
+
+  gm.segIdx = idx;
+  var seg = gm.segments[idx];
+  if (!seg) { gameDone(); return; }
+
+  if (seg.el) {
+    seg.el.className = 'game-segment ' + (seg.isStop ? 'waiting' : 'current');
+    scrollToSegment(seg.el);
+  }
+
+  if (seg.chord) playGameChord(seg.chord);
+  updateHUD();
+
+  if (!seg.isStop) {
+    setTimeout(function(){ if (gm.running) advanceToSegment(idx + 1); }, 80);
+    return;
+  }
+
+  if (gm.mode === 'beginner') {
+    document.getElementById('hudStatus').textContent = 'Play  ' + seg.chord + '  and strum ↓';
+    document.getElementById('hudMic').className = 'game-hud-mic listening';
+    document.getElementById('hudMic').style.display = 'flex';
+    document.getElementById('hudMic').textContent = '🎙';
+    gm.waiting = true;
+
+    listenForChord(seg.chord, function onResult(ok) {
+      if (!gm.running) return;
+      gm.waiting = false;
+      if (ok) {
+        if (seg.el) seg.el.className = 'game-segment current';
+        document.getElementById('hudMic').className = 'game-hud-mic success';
+        document.getElementById('hudMic').textContent = '✓';
+        document.getElementById('hudStatus').textContent = '✓ Great!';
+        setTimeout(function(){ if (gm.running) advanceToSegment(idx + 1); }, 400);
+      } else {
+        document.getElementById('hudMic').className = 'game-hud-mic fail';
+        document.getElementById('hudMic').textContent = '✗';
+        document.getElementById('hudStatus').textContent = 'Try again — play ' + seg.chord;
+        setTimeout(function(){
+          if (!gm.running) return;
+          document.getElementById('hudMic').className = 'game-hud-mic listening';
+          document.getElementById('hudMic').textContent = '🎙';
+          gm.waiting = true;
+          listenForChord(seg.chord, onResult);
+        }, 700);
+      }
+    });
+  }
+}
+
+function gameDone() {
+  gm.running = false;
+  document.getElementById('gamePlayBtn').className = 'game-play-btn play';
+  document.getElementById('gamePlayBtn').textContent = '▶ Restart';
+  document.getElementById('hudStatus').textContent = '🎉 Song complete!';
+  document.getElementById('hudMic').style.display = 'none';
+}
+
+function updateHUD() {
+  var seg = gm.segments[gm.segIdx];
+  var curChord = seg ? seg.chord : '';
+  if (!curChord) {
+    for (var i = gm.segIdx - 1; i >= 0; i--) {
+      if (gm.segments[i] && gm.segments[i].chord) { curChord = gm.segments[i].chord; break; }
+    }
+  }
+  var nextChord = '';
+  for (var j = gm.segIdx + 1; j < gm.segments.length; j++) {
+    if (gm.segments[j] && gm.segments[j].chord && gm.segments[j].chord !== curChord) { nextChord = gm.segments[j].chord; break; }
+  }
+  document.getElementById('hudChordName').textContent = curChord || '—';
+  document.getElementById('hudNextChord').textContent = nextChord || '—';
+  document.getElementById('hudDiagram').innerHTML = curChord ? drawChord(curChord, 'mini', getChordsForType(curChord)) : '';
+}
+
+function ensureGameAudio() {
+  if (!gm.audioCtx) gm.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+var CHORD_NOTES = {
+  G:[98,123.47,146.83,196,246.94,392], C:[130.81,164.81,196,261.63,329.63],
+  D:[146.83,196,246.94,293.66], Em:[82.41,123.47,164.81,196,246.94,329.63],
+  Em7:[82.41,123.47,164.81,196,246.94,293.66], Am:[110,146.83,196,220,261.63],
+  E:[82.41,123.47,164.81,207.65,246.94,329.63], F:[174.61,220,261.63,349.23],
+  Cadd9:[130.81,196,261.63,293.66,329.63], A:[110,138.59,184.99,220,277.18],
+  Bm:[123.47,146.83,184.99,246.94], B7:[123.47,154,185,246.94],
+};
+
+function playGameChord(chordKey) {
+  ensureGameAudio();
+  var notes = CHORD_NOTES[chordKey] || [CHORD_ROOTS[chordKey] || 196];
+  var now = gm.audioCtx.currentTime;
+  notes.forEach(function(freq, i) {
+    var osc = gm.audioCtx.createOscillator();
+    var gain = gm.audioCtx.createGain();
+    var filt = gm.audioCtx.createBiquadFilter();
+    filt.type = 'lowpass'; filt.frequency.value = 1800;
+    osc.type = 'triangle'; osc.frequency.value = freq;
+    var t = now + i * 0.018;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.14, t + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
+    osc.connect(filt); filt.connect(gain); gain.connect(gm.audioCtx.destination);
+    osc.start(t); osc.stop(t + 1.7);
+  });
+}
+
+// ─── Mic chord detection ──────────────────────────────────
+async function startGameMic() {
+  if (gm.micStream) return;
+  ensureGameAudio();
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({audio:true, video:false});
+    gm.micStream = stream;
+    gm.micAnalyser = gm.audioCtx.createAnalyser();
+    gm.micAnalyser.fftSize = 4096;
+    var src = gm.audioCtx.createMediaStreamSource(stream);
+    src.connect(gm.micAnalyser);
+  } catch(e) {
+    document.getElementById('hudStatus').textContent = 'Mic denied — tap segment to advance';
+    // Tap fallback
+    document.getElementById('gameLyricsPanel').addEventListener('click', function() {
+      if (gm.waiting) { gm.waiting = false; advanceToSegment(gm.segIdx + 1); }
+    });
+  }
+}
+
+function stopGameMic() {
+  if (gm.micStream) { gm.micStream.getTracks().forEach(function(t){t.stop();}); gm.micStream = null; }
+  gm.micAnalyser = null;
+}
+
+function getDetectedFreq() {
+  if (!gm.micAnalyser) return -1;
+  var buf = new Float32Array(gm.micAnalyser.fftSize);
+  gm.micAnalyser.getFloatTimeDomainData(buf);
+  // RMS check
+  var rms = 0;
+  for (var i = 0; i < buf.length; i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms / buf.length);
+  if (rms < 0.012) return -1;
+  // Autocorrelate
+  var SIZE = buf.length, r1 = 0, r2 = SIZE - 1;
+  for (var i2 = 0; i2 < SIZE/2; i2++) { if (Math.abs(buf[i2]) > 0.15) { r1 = i2; break; } }
+  for (var i3 = 1; i3 < SIZE/2; i3++) { if (Math.abs(buf[SIZE-i3]) > 0.15) { r2 = SIZE-i3; break; } }
+  var trimmed = buf.slice(r1, r2 + 1);
+  var c = new Float32Array(trimmed.length);
+  for (var i4 = 0; i4 < trimmed.length; i4++) for (var j = 0; j < trimmed.length - i4; j++) c[i4] += trimmed[j] * trimmed[j+i4];
+  var d = 0;
+  while (c[d] > c[d+1]) d++;
+  var maxVal = -1, maxPos = -1;
+  for (var i5 = d; i5 < trimmed.length; i5++) if (c[i5] > maxVal) { maxVal = c[i5]; maxPos = i5; }
+  if (maxPos < 1) return -1;
+  var x1 = c[maxPos-1], x2 = c[maxPos], x3 = c[maxPos+1];
+  var a = (x1 + x3 - 2*x2) / 2;
+  var b2 = (x3 - x1) / 2;
+  var T0 = a ? maxPos - b2/(2*a) : maxPos;
+  return gm.audioCtx.sampleRate / T0;
+}
+
+function freqMatchesChord(freq, chordKey) {
+  if (freq <= 0) return false;
+  var root = CHORD_ROOTS[chordKey];
+  if (!root) return true; // unknown chord — pass through
+  // Check all octaves of root ±15%
+  for (var oct = -1; oct <= 3; oct++) {
+    var target = root * Math.pow(2, oct);
+    if (Math.abs(freq - target) / target < 0.15) return true;
+  }
+  return false;
+}
+
+var _listenTimer = null;
+function listenForChord(expectedChord, callback) {
+  if (_listenTimer) clearInterval(_listenTimer);
+  var attempts = 0;
+  var maxAttempts = 200; // ~10 sec
+
+  // Tap fallback always available
+  var tapHandler = function() {
+    if (!gm.waiting) return;
+    clearInterval(_listenTimer);
+    gm.waiting = false;
+    document.getElementById('gameLyricsPanel').removeEventListener('click', tapHandler);
+    callback(true);
+  };
+  document.getElementById('gameLyricsPanel').addEventListener('click', tapHandler);
+
+  if (!gm.micAnalyser) {
+    // No mic — rely on tap only
+    return;
+  }
+
+  _listenTimer = setInterval(function() {
+    if (!gm.running || !gm.waiting) { clearInterval(_listenTimer); return; }
+    var freq = getDetectedFreq();
+    if (freq > 0) {
+      clearInterval(_listenTimer);
+      document.getElementById('gameLyricsPanel').removeEventListener('click', tapHandler);
+      callback(freqMatchesChord(freq, expectedChord));
+    }
+    attempts++;
+    if (attempts > maxAttempts) {
+      clearInterval(_listenTimer);
+      document.getElementById('gameLyricsPanel').removeEventListener('click', tapHandler);
+      callback(true); // timeout — just advance
+    }
+  }, 50);
+}
+
+
+renderGuitarTypes();
+renderStrumming();
+renderChordPills();
+renderChordDetail();
+renderSongGrid();
+renderThumbTips();
+renderStringBtns();
+</script>
+</body>
+</html>
